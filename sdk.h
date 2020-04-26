@@ -669,9 +669,7 @@ INTERFACE(Trace)
 
 INTERFACE(PlayerInfoManager)
 {
-	if (Init("server", "PlayerInfoManager"))
-	{
-	}
+	if (Init("server", "PlayerInfoManager")) {}
 }
 	DECLFUNC(1, GlobalVars*, GetGlobalVars, (), (void*), (THIS));
 };

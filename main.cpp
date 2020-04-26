@@ -265,7 +265,6 @@ DECLVHOOK(void, SetViewAngles, (Vector &a))
 {	
 	CUserCmd* cmd = get_SI<CUserCmd*>();
 	unsigned* sequence_number = (*get_BP<unsigned**>() + 2);
-
 	if (MENU_NOSETVRC)
 	{
 		if (gmod()){if (cmd && cmd->tick_count == 0 && cmd->predicted)return;}
@@ -382,11 +381,7 @@ int __stdcall DllMain(void*, int r, void*)
 		pd = new IPrediction();
 		isystem = new IInputSystem();
 		iplayer = new IPlayerInfoManager();
-		globals = **(GlobalVars***)util::FindPatternComplex(client->GetMethod(0), 0x64, 3,
-			"\x89\x0D",
-			"\x51\xA3",
-			"\x10\xA3"
-		);
+		globals = iplayer->GetGlobalVars();
 		Netvars::Initialize();
 		Netvars::Dump("nanohack/netvars.txt");
 		//Netvars::HookNetvar("*", "m_angEyeAngles[0]", antiaim::Proxy_X);
