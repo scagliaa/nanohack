@@ -5,7 +5,7 @@ extern ITrace* trace;
 extern IEngine* engine;
 extern IEntities* ents;
 extern IModelInfo* mdlinfo;
-
+extern IPlayerInfoManager* iplayer;
 extern GlobalVars* globals;
 
 int menu[MENU_ITEMS];
@@ -64,18 +64,16 @@ void gui::RenderInGameOverlay()
 			#define esp_x svec.x
 			#define esp_y svec.y + (n_lines++) * 12
 
-			if (MENU_ESPNAMES)
+			if (MENU_ESPNAMES) 
 				draw::Text(esp_x, esp_y, 0, ESP, pl->GetNickSafe());
+
 
 			if (MENU_WEAPONWH)
 			if (CBaseEntity* w = pl->GetActiveWeapon())
 			{
 				char wname[256]; strcpy(wname, w->GetClassname());
-
 				#define	filter(w) if (char* kw = strstr(wname, w)) strcpy(kw, kw + strlen(w))
-				
 				filter("weapon");
-
 				if (tf2())
 				{
 					filter("tf");
@@ -83,7 +81,6 @@ void gui::RenderInGameOverlay()
 					filter("medic");
 					filter("primary");
 				}
-
 				draw::Text(esp_x, esp_y, 0, ESP, util::MakeFancy(wname));
 			}
 			else
@@ -100,36 +97,30 @@ void gui::RenderInGameOverlay()
 			{
 				char state[128];
 				int cond = pl->TF2_GetPlayerCond();
-				
 				#define ConfirmState(s)	{ *state = '*'; strcpy(state + strlen(state), s); }
 				*state = 0;
-
 				if (tf2())
 				{
 					#define alias(a, c) if (chk(cond, c)) ConfirmState(a)
-
 					alias("Slow", PlayerCond_Slowed	);
 					alias("Disg", PlayerCond_Disguised);
 					alias("Clkd", PlayerCond_Cloaked);
 					alias("Uber", PlayerCond_Ubercharged);
 					alias("Bonk", PlayerCond_Bonked);
 					alias("Tntn", PlayerCond_Taunting);
-
 					#undef alias
 				}
-
 				if (*state == '*')
 					draw::Text(esp_x, esp_y, 0, ESP, state);
-
 				#undef ConfirmState
 			}
-
 			#undef esp_x
 			#undef esp_y
 		}
 	}
 
-	if (MENU_ENTITYWH) for (int i = maxpl + 1; i <= maxen; ++i)
+	if (MENU_ENTITYWH) 
+		for (int i = maxpl + 1; i <= maxen; ++i)
 	if (CBaseEntity* e = ents->GetClientEntity(i))
 	{
 		if (e->IsDormant())
@@ -169,11 +160,7 @@ void gui::RenderInGameOverlay()
 		{
 			RegSpecificESP(CC4, "[C4]", CC_LIGHTRED);
 			RegSpecificESP(CPlantedC4, "[*C4]", CC_RED);
-
-			// e->GetESPColor()
-
 			RecvTable* p = cl->m_pRecvTable->m_pProps[0].m_pDataTable;
-
 			if (p && strstr(p->m_pNetTableName, "Weapon") && !ReadPtr<char>(e, m_iState))
 			{
 				char wname[128];
@@ -531,14 +518,14 @@ void gui::InitForms()
 
 	new_Panel()
 	{
-		def_Panel("Screenspace");
+		def_Panel("ESP");
 
 		panel->AddSplitter("Visuals");
 
 		AddCheckbox("No visual interferences", MENU_INTERFRN);
 		AddCheckbox("No visual recoil", MENU_NOVISREC);
 
-		panel->AddSplitter("ESP");
+		panel->AddSplitter("Info");
 		panel->autofill = 0;
 
 		AddComboBox(MENU_ENEMYESP, panel->fill_vert + 5,

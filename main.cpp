@@ -321,13 +321,9 @@ DECLVHOOK(void, PaintTraverse, (unsigned p, void* a2, void* a3))
 		{
 			if (GetAsyncKeyState(VK_INSERT) & 1 && !forms::F_KeyTrap::glob_active)
 				usermenu->SetVisible(!usermenu->GetVisible());
-			if (open_menu != usermenu->GetVisible())
-			{
-				if (open_menu = usermenu->GetVisible())
-					pipe::LoadConfig("generic.cfg");
-				else
-					pipe::SaveConfig("generic.cfg");
-			}
+			open_menu ? panel->SetMouseInputEnabled(p, true) : panel->SetMouseInputEnabled(p, false);
+			if (open_menu != usermenu->GetVisible()) 
+				open_menu = usermenu->GetVisible() ? pipe::LoadConfig("generic.cfg") : pipe::SaveConfig("generic.cfg");
 		}
 	} else {
 		static int p_view = 0;
@@ -399,10 +395,7 @@ int __stdcall DllMain(void*, int r, void*)
 		{
 			extern JMP* jmpFireBullets;
 			extern void __fastcall hooked_FireBullets(CBaseEntity * ecx, void*, char* fb);
-			jmpFireBullets = new JMP(
-				(void*)util::FindPattern("client", "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC????\x56\x8B\x73\x08"),
-				(void*)hooked_FireBullets
-			);
+			jmpFireBullets = new JMP((void*)util::FindPattern("client", "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC????\x56\x8B\x73\x08"), (void*)hooked_FireBullets);
 		}
 		client->HookMethod(36, &hooked_DispatchUserMessage, &orgDispatchUserMessage);
 		engine->HookMethod(20, &hooked_SetViewAngles, &orgSetViewAngles);

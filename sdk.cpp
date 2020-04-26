@@ -9,24 +9,20 @@ bool EInterface::Init(unsigned long** base)
 	{
 		m_hook = new VMT(m_vmt);
 		m_size = m_hook->szVMT;
-		
 		return 1;
 	}
-	
 	return 0;
 }
 
 bool EInterface::Init(const char* dll, const char* name, int v)
 {
 	CreateInterfaceFn CreateInterface = (CreateInterfaceFn)IMPORT(dll, "CreateInterface");
-
 	if (!v)
 	{
 		for (int i = 99; i && !v; i--)
 		if (CreateInterface(format("%s%03i", name, i), 0))
 			v = i;
 	}
-
 	return Init((unsigned long**)CreateInterface(format("%s%03i", name, v), 0));
 }
 
@@ -37,23 +33,17 @@ void EInterface::HookMethod(int m, void* hook, void* original)
 	if (original)
 		*(unsigned long*)original = org;
 }
-
 unsigned long EInterface::GetMethod(int m)
 {
 	return m_hook->GetMethodAddress(m);
 }
-
-unsigned long long
-	CBaseEntity::GetSteamID()
+unsigned long long CBaseEntity::GetSteamID()
 {
 	extern IEngine* engine;
-
 	player_info info;
 	engine->GetPlayerInfo(EntIndex(), &info);
-
 	return 76561197960265728ull + info.friendsid;
 }
-
 bool CBaseEntity::IsSteamFriend()
 {
 	static unsigned pipe = ((unsigned (*)())IMPORT("steamclient", "Steam_CreateSteamPipe"))();
@@ -82,14 +72,12 @@ bool CBaseEntity::IsSteamFriend()
 
 	return 0;
 }
-
 const char* CBaseEntity::GetClassname()
 {
 	typedef const char* (__thiscall* GetClassnameFn)(void*);
 	static GetClassnameFn f = (GetClassnameFn)util::CalcAbsAddress(util::FindPattern("client", "\xE8????\x50\x68????\xFF\x15????\x83\xC4\x0C\x5F\x5E\x8B\xE5") + 1);
 	return f(this);
 }
-
 WeaponInfo* CBaseEntity::GetWeaponInfo()
 {
 	if (css())
@@ -108,10 +96,8 @@ WeaponInfo* CBaseEntity::GetWeaponInfo()
 
 	return 0;
 }
-
 studiohitboxset* CBaseEntity::hboxset = 0;
 matrix3x4 CBaseEntity::matrix[BONE_ARRAY];
-
 bool CBaseEntity::UpdateBones()
 {
 	extern IModelInfo* mdlinfo;
@@ -127,16 +113,10 @@ bool CBaseEntity::UpdateBones()
 		return 0;
 
 	typedef bool (__thiscall* SetupBonesFn)(void*, matrix3x4*, int, int, float);
-	static SetupBonesFn SetupBones =
-		(SetupBonesFn)util::FunctionStart(
-			util::FindRefString("client", "*** ERROR: Bone access not allowed (entity %i:%s)")
-		);
-
-
-
+	static SetupBonesFn SetupBones =(SetupBonesFn)util::FunctionStart(util::FindRefString("client", "*** ERROR: Bone access not allowed (entity %i:%s)"));
 	if (SetupBones((void**)this + 1, matrix, BONE_ARRAY, 0x100, ReadPtr<float>(this, m_flSimulationTime)))
-	if (hboxset = MakePtr<studiohitboxset>(stdhdr, ReadPtr<int>(stdhdr, 0xB0)))
-		return 1;
+		if (hboxset = MakePtr<studiohitboxset>(stdhdr, ReadPtr<int>(stdhdr, 0xB0)))
+			return 1;
 
 	return 0;
 }
@@ -151,7 +131,8 @@ CBaseEntity* CBaseEntity::GetActiveWeapon()
 
 Vector CBaseEntity::GetAbsOrigin()
 {
-	static unsigned long m_vecAbsOrigin = *(unsigned long*)(util::FindPattern((unsigned long)GetVFunc<void*>(this, 9), 0x20, "\xE8????\x8D\x86?????\xC3") + 7);
+	static unsigned long m_vecAbsOrigin = *(unsigned long*)(util::FindPattern((unsigned long)GetVFunc<void*>(this, 9), 0x20, "\xE8????\x8D\x86?????\xC3") + 7); 
+	// E8 ? ? ? ? 8D 86 ? ? ? ? ? C3
 	//util::Message("m_vecAbsOrigin + %X", m_vecAbsOrigin);
 	// m_vecAbsOrigin = m_vecOrigin - 0xD8 // get rekt
 
@@ -171,7 +152,7 @@ Vector CBaseEntity::GetAbsAngles()
 
 ?? there's literally a vfunc.
 **/
-int CBaseEntity::GetMaxHealth()
+/*int CBaseEntity::GetMaxHealth()
 {
 	if (tf2())
 	{
@@ -207,7 +188,7 @@ int CBaseEntity::GetMaxHealth()
 	}
 
 	return 100;
-}
+}*/
 
 unsigned CBaseEntity::GetHPColor()
 {

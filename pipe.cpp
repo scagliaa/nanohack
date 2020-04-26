@@ -70,11 +70,12 @@ char* pipe::ModQuery()
 
 	switch (appid)
 	{
-	case 240:	return "css";
-	case 300:	return "dod";
-	case 440:	return "tf2";
-	case 4000:	return "gmod";
-	default:	return "unknown";
+		case 240:	return "Counter-Strike: Source";
+		case 300:	return "Day of Defeat: Source";
+		case 440:	return "Team Fortress 2";
+		case 4000:	return "Garry's Mod";
+		case 362890: return "Black Mesa: Source";
+		default:	return "Unknown APPID";
 	}
 }
 

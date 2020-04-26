@@ -114,10 +114,6 @@ int CBaseEntity::GetNextFlags()
 	return next_flags;
 }
 
-
-
-
-
 bool aimbot::Ignore(CBaseEntity* e)
 {
 	if (MENU_RAGEBOTE && e->EntIndex() == ragebot)
@@ -425,8 +421,8 @@ bool aimbot::Think(CUserCmd* cmd)
 			if (pl == lp)
 				continue;
 
-			//if (pl->IsDormant())
-			//	continue;
+			if (pl->IsDormant())
+				continue;
 
 			if (!pl->GetModel())
 				continue;
@@ -448,21 +444,8 @@ bool aimbot::Think(CUserCmd* cmd)
 
 				if (tf2())
 				{
-					if (
-						lowp = (
-							strcmp(cclass, "CObjectSentrygun") ||
-							ReadPtr<bool>(pl, m_bHasSapper)
-						) &&
-						(
-							strcmp(cclass, "CTFGrenadePipebombProjectile") ||
-							!ReadPtr<int>(pl, m_iType) ||
-							!ReadPtr<bool>(pl, m_bTouched) ||
-							!pl->IsDummyProjectile() ||
-							sp.DistTo(lp->GetAbsOrigin()) > 768.f
-						)
-					)
+					if (lowp = (strcmp(cclass, "CObjectSentrygun") ||ReadPtr<bool>(pl, m_bHasSapper)) &&(strcmp(cclass, "CTFGrenadePipebombProjectile") ||!ReadPtr<int>(pl, m_iType) || !ReadPtr<bool>(pl, m_bTouched) ||!pl->IsDummyProjectile() ||sp.DistTo(lp->GetAbsOrigin()) > 768.f))
 						continue;
-
 					if (pl->GetTeam() == lteam)
 						continue;
 				}
@@ -485,20 +468,19 @@ bool aimbot::Think(CUserCmd* cmd)
 
 			int aim = GetAimBone(pl);
 			bool doscan = 1;
-
+#define trace if(BulletTrace(sp,box,pl))\
+			  {\
+				target_id = i;\
+				best = rate;\
+				tp = box;\
+				continue;\
+			  }
 			if (pl->GetHitbox(aim))
 			{
 				Vector box = pl->GetBoxPos(aim);
-
-				if (BulletTrace(sp, box, pl))
-				{
-					target_id	= i;
-					best		= rate;
-					tp			= box;
-
-					continue;
-				}
+				trace
 			}
+			
 
 			if (doscan && MENU_BONESCAN)
 			{
@@ -507,20 +489,11 @@ bool aimbot::Think(CUserCmd* cmd)
 				{
 					if (j == aim)
 						continue;
-
 					if (pl->GetHitbox(j))
 					{
 						Vector box = pl->GetBoxPos(j);
-
-						if (BulletTrace(sp, box, pl))
-						{
-							target_id	= i;
-							best		= rate;
-							tp			= box;
-
-							continue;
-						}
-					}
+						trace
+					} 
 				}
 			}
 		}

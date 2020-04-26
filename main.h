@@ -12,11 +12,13 @@
 
 // other se games
 #define	gmod()	(pipe::appid == 4000)
+#define bms()	(pipe::appid == 362890)
 
 // engines/series
 #define	e_cs()		(dod() || css())
 #define	e_hl2()		(tf2() || gmod())
 #define	e_orgbx()	(e_cs() || e_hl2())
+#define e_all()		(dod() || css() || tf2() || gmod())
 
 #define	add(dst, flag)	((dst) |= (flag))
 #define	del(dst, flag)	((dst) &=~(flag))

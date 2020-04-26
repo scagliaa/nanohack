@@ -358,6 +358,8 @@ public:
 	DECLFUNCA(8,	bool,			IsDormant,		(), (void*), ((void**)this + 2), (void**)this + 2);
 	DECLFUNCA(9,	int,			EntIndex,		(), (void*), ((void**)this + 2), (void**)this + 2);
 	DECLFUNCA(9,	void*,			GetModel,		(), (void*), ((void**)this + 1), (void**)this + 1);
+	DECLFUNCA(107,	int,			GetMaxHealth,	(), (void*), (this),			 (this));
+	DECLFUNCA(339,	char*,			GetName,		(), (void*), (this),			 (this));
 
 	static studiohitboxset*	hboxset;
 	static matrix3x4		matrix[BONE_ARRAY];
@@ -408,7 +410,7 @@ public:
 	int GetFlags();
 	int GetNextFlags();
 
-	int GetMaxHealth();
+	//int GetMaxHealth();
 	inline int GetHealth()
 	{
 		extern int m_iHealth;
@@ -431,7 +433,6 @@ public:
 
 	const char*	GetNick();
 	const char* GetNickSafe();
-
 
 	inline Vector GetAbsCenter()
 	{
@@ -633,31 +634,17 @@ public:
 	bool Init(const char* dll, const char* name, int ver = 0);
 	void HookMethod(int m, void* hook, void* original);
 	unsigned long GetMethod(int m);
-
 	inline unsigned long GetBase()
 	{
 		return (unsigned long)m_vmt;
 	}
-
-
-
-	EInterface()
-	{
-	}
-
-	EInterface(unsigned long base)
-	{
-		if (Init((unsigned long**)base))
-		{
-		}
-	}
+	EInterface(){}
+	EInterface(unsigned long base) {if (Init((unsigned long**)base)){}}
 };
 
 INTERFACE(Trace)
 	{
-		if (Init("engine", "EngineTraceClient"))
-		{
-		}
+		if (Init("engine", "EngineTraceClient")){}
 	}
 
 	DECLFUNC(4, void, TraceRay,
@@ -668,18 +655,15 @@ INTERFACE(Trace)
 };
 
 INTERFACE(PlayerInfoManager)
-{
-	if (Init("server", "PlayerInfoManager")) {}
-}
+	{
+		if (Init("server", "PlayerInfoManager")) {}
+	}
 	DECLFUNC(1, GlobalVars*, GetGlobalVars, (), (void*), (THIS));
 };
 
 INTERFACE(Physics)
 	{
-		if (Init("vphysics", "VPhysicsSurfaceProps"))
-		{
-
-		}
+		if (Init("vphysics", "VPhysicsSurfaceProps")){}
 	}
 
 	DECLFUNC(5, surfacedata*, GetSurfaceData,
@@ -691,9 +675,7 @@ INTERFACE(Physics)
 
 INTERFACE(ModelInfo)
 	{
-		if (Init("engine", "VModelInfoClient"))
-		{
-		}
+		if (Init("engine", "VModelInfoClient")){}
 	}
 
 	DECLFUNC(3,		const char*,	GetModelName,	(const void* model), (void*, const void*), (THIS, model));
@@ -702,9 +684,7 @@ INTERFACE(ModelInfo)
 
 INTERFACE(Client)
 	{
-		if (Init("client", "VClient"))
-		{
-		}
+		if (Init("client", "VClient")){}
 	}
 
 	DECLFUNC(8, ClientClass*, GetAllClasses, (), (void*), (THIS));
@@ -712,9 +692,7 @@ INTERFACE(Client)
 
 INTERFACE(Entities)
 	{
-		if (Init("client", "VClientEntityList"))
-		{
-		}
+		if (Init("client", "VClientEntityList")){}
 	}
 
 	DECLFUNC(3, CBaseEntity*,	GetClientEntity,		(int entid),			(void*, int),			(THIS, entid));
@@ -724,9 +702,7 @@ INTERFACE(Entities)
 
 INTERFACE(Engine)
 	{
-		if (Init("engine", "VEngineClient"))
-		{
-		}
+		if (Init("engine", "VEngineClient")){}
 	}
 	
 	DECLFUNC(5, void,	GetScreenSize,		(int &w, int &h), (void*, int&, int&), (THIS, w, h))
@@ -734,8 +710,7 @@ INTERFACE(Engine)
 	DECLFUNC(12, int,	GetLocalPlayer,		(), (void*), (THIS))
 	DECLFUNC(26, bool,	IsInGame,			(), (void*), (THIS))
 
-	DECLFUNC(36,
-		matrix4x4&, GetViewMatrix, (), (void*), (THIS))
+	DECLFUNC(36, matrix4x4&, GetViewMatrix, (), (void*), (THIS))
 
 	DECLFUNC(72, NetChannel*, GetNetChannel, (), (void*), (THIS))
 	DECLFUNC(19, void,	GetViewAngles,		(Vector &a), (void*, Vector&), (THIS, a));
@@ -744,20 +719,19 @@ INTERFACE(Engine)
 
 INTERFACE(Panel)
 	{
-		if (Init("vgui2", "VGUI_Panel"))
-		{
-		}
+		if (Init("vgui2", "VGUI_Panel")){}
 	}
-	
+	DECLFUNC(32, void, SetMouseInputEnabled, (unsigned int p, bool b),
+		(void*, unsigned int, bool),
+		(THIS, p, b)
+	);
 	DECLFUNC(36, const char*, GetName, (unsigned p), (void*, unsigned), (THIS, p));
 	DECLFUNC(17, int, GetChildCount, (unsigned p), (void*, unsigned), (THIS, p));
 };
 
 INTERFACE(InputSystem)
 	{
-		if (Init("inputsystem", "InputSystemVersion")) 
-		{
-		}
+		if (Init("inputsystem", "InputSystemVersion")) {}
 	}
 // https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/public/appframework/IAppSystem.h
 // https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/public/inputsystem/iinputsystem.h
@@ -766,9 +740,7 @@ INTERFACE(InputSystem)
 };
 INTERFACE(Surface)
 	{
-		if (Init("vguimatsurface", "VGUI_Surface"))
-		{
-		}
+		if (Init("vguimatsurface", "VGUI_Surface")){}
 	}
 
 	DECLFUNC(11,	void, DrawSetColor,		(int r, int g, int b, int a),		(void*, int, int, int, int),	(THIS, r, g, b, a));
@@ -806,9 +778,7 @@ INTERFACE(Surface)
 
 INTERFACE(Movement)
 	{
-		if (Init("client", "GameMovement"))
-		{
-		}
+		if (Init("client", "GameMovement")){}
 	}
 
 	DECLFUNC(1,	void, ProcessMovement, (CBaseEntity* pl, char* md), (void*, CBaseEntity*, char*), (THIS, pl, md));
@@ -816,9 +786,7 @@ INTERFACE(Movement)
 
 INTERFACE(Prediction)
 	{
-		if (Init("client", "VClientPrediction"))
-		{
-		}
+		if (Init("client", "VClientPrediction")){}
 	}
 	
 	DECLFUNC(17, void, RunCommand,	(CBaseEntity* pl, CUserCmd* cmd, void* mv), (void*, CBaseEntity*, CUserCmd*, void*),		(THIS, pl, cmd, mv));
