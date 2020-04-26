@@ -745,9 +745,19 @@ INTERFACE(Panel)
 	
 	DECLFUNC(36, const char*, GetName, (unsigned p), (void*, unsigned), (THIS, p));
 	DECLFUNC(17, int, GetChildCount, (unsigned p), (void*, unsigned), (THIS, p));
-
 };
 
+INTERFACE(InputSystem)
+	{
+		if (Init("inputsystem", "InputSystemVersion")) 
+		{
+		}
+	}
+// https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/public/appframework/IAppSystem.h
+// https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/public/inputsystem/iinputsystem.h
+// thus it is at the 7th index. 
+	DECLFUNC(7, void, EnableInput, (bool bEnable), (void*, bool), (THIS, bEnable));
+};
 INTERFACE(Surface)
 	{
 		if (Init("vguimatsurface", "VGUI_Surface"))
@@ -764,16 +774,27 @@ INTERFACE(Surface)
 	DECLFUNC(19,	void, DrawSetTextColor,	(int r, int g, int b, int a),		(void*, int, int, int, int),	(THIS, r, g, b, a));
 	DECLFUNC(20,	void, DrawSetTextPos,	(int x, int y),						(void*, int, int),				(THIS, x, y));
 	DECLFUNC(22,	void, DrawPrintText,	(const wchar_t* x, int l),			(void*, const wchar_t*, int, int),	(THIS, x, l, 0));
-
+	DECLFUNC(52, void, SetCursorAlwaysVisible, (bool bEnable),
+		(void*, bool),
+		(THIS, bEnable)
+	);
 	DECLFUNC(66,	unsigned long, CreateFont,	(), (void*), (THIS));
 	DECLFUNC(67,	void, SetFontGlyphSet,		(unsigned long f, const char* n, int t, int w, int b, int s, int fl, int _min, int _max),
 		(void*, unsigned long, const char*, int, int, int, int, int, int, int),
 		(THIS, f, n, t, w, b, s, fl, _min, _max)
 	);
-
+	//	virtual void SetCursorAlwaysVisible( bool visible ) = 0;
 	DECLFUNC(75,	void, GetTextSize,			(unsigned long f, const wchar_t* x, int& w, int& h),
 		(void*, unsigned long, const wchar_t*, int&, int&),
 		(THIS, f, x, w, h)
+	);
+	DECLFUNC(61, void, UnlockCursor, (),
+		(void*),
+		(THIS)
+	);
+	DECLFUNC(62, void, LockCursor, (),
+		(void*),
+		(THIS)
 	);
 };
 
@@ -808,7 +829,6 @@ INTERFACE(LuaShared)
 
 	DECLFUNC(6, ILuaInterface*, GetLuaInterface, (char state), (void*, char), (THIS, state));
 };
-
 
 
 typedef void* (*CreateInterfaceFn)(const char*, unsigned long);

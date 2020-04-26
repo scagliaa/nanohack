@@ -13,6 +13,7 @@ IMovement*	movement= 0;
 IModelInfo*	mdlinfo	= 0;
 ILuaShared* glua	= 0;
 GlobalVars*	globals	= 0;
+IInputSystem* isystem = 0;
 
 // IGameEventManager*	evmgr	= 0;
 IPrediction*pd		= 0;
@@ -54,7 +55,7 @@ void CreateMove(CUserCmd* cmd)
 	if (!MENU_FAKEVIEW && aim)
 		engine->SetViewAngles(cmd->viewangles);
 
-	//nospread::HandleCmd(cmd, w); Patched in 2014. Useless.
+	nospread::HandleCmd(cmd, w); 
 	/**
 	todo: projectile nospread
 	**/
@@ -302,7 +303,6 @@ DECLVHOOK(void, SetViewAngles, (Vector &a))
 		// csgo: register (BL) bool bSendPacket
 	}
 }
-
 DECLVHOOK(void, RunCommand, (CBaseEntity* pl, CUserCmd* cmd, void* mv))
 {
 	
@@ -332,41 +332,23 @@ DECLVHOOK(void, RunCommand, (CBaseEntity* pl, CUserCmd* cmd, void* mv))
 		orgRunCommand(pl, cmd, mv);
 		
 }
-
+static bool open_menu = 0; 
 DECLVHOOK(void, PaintTraverse, (unsigned p, void* a2, void* a3))
 {
 	orgPaintTraverse(p, a2, a3);
-
 	#define SetPanelForMod(mod, pname) (mod() && !strcmp(panel->GetName(p), pname)) ||
-
-	if (
-		(
-			SetPanelForMod(gmod,	"OverlayPopupPanel")
-			SetPanelForMod(e_orgbx,	"FocusOverlayPanel")
-		0)
-
-		&& !panel->GetChildCount(p))
-	{
+	if ((SetPanelForMod(gmod,	"OverlayPopupPanel") SetPanelForMod(e_orgbx,	"FocusOverlayPanel") 0) && !panel->GetChildCount(p)) {
 		surface->DrawSetTextFont(draw::GetFont());
-
-
-
 		if (engine->IsInGame() && LocalPlayer())
 			gui::RenderInGameOverlay();
-
-		static bool open_menu = 0;
 		extern forms::F_Form* usermenu;
-		
 		if (forms::Init())
 			gui::InitForms();
-		
 		forms::Render();
-		
 		if (usermenu)
 		{
 			if (GetAsyncKeyState(VK_INSERT) & 1 && !forms::F_KeyTrap::glob_active)
 				usermenu->SetVisible(!usermenu->GetVisible());
-
 			if (open_menu != usermenu->GetVisible())
 			{
 				if (open_menu = usermenu->GetVisible())
@@ -375,11 +357,8 @@ DECLVHOOK(void, PaintTraverse, (unsigned p, void* a2, void* a3))
 					pipe::SaveConfig("generic.cfg");
 			}
 		}
-	}
-	else
-	{
+	} else {
 		static int p_view = 0;
-
 		if (!p_view && !strcmp(panel->GetName(p), "CBaseViewport"))
 			p_view = p;
 		
@@ -387,20 +366,23 @@ DECLVHOOK(void, PaintTraverse, (unsigned p, void* a2, void* a3))
 			draw::w2s = engine->GetViewMatrix();
 	}
 }
-
+DECLVHOOK(void, LockCursor, ())
+{
+	if (open_menu) {
+		isystem->EnableInput(false);
+		surface->UnlockCursor();
+	} else {
+		isystem->EnableInput(true);
+		return orgLockCursor();
+	}
+}
 DECLVHOOK(bool, DispatchUserMessage, (int msgn, char** buf))
 {
 	if (strstr(*buf, "Chat") && (unsigned)buf[2] > 0x4B0)
 		return 1;
-
 	return orgDispatchUserMessage(msgn, buf);
 }
-
-
-
-
 char hooked_GetUserCmd[0x64];
-
 int __stdcall DllMain(void*, int r, void*)
 {
 	if (r == 1 /* && OpenMutex(1, 1, "/nhmtx") */)
@@ -435,14 +417,13 @@ int __stdcall DllMain(void*, int r, void*)
 	
 		movement= new IMovement();
 		pd		= new IPrediction();
+		isystem = new IInputSystem();
 
 		globals = **(GlobalVars***)util::FindPatternComplex(client->GetMethod(0), 0x64, 3,
 				"\x89\x0D",
 				"\x51\xA3",
 				"\x10\xA3"
 			);
-	
-
 
 		Netvars::Initialize();
 		Netvars::Dump("nanohack/netvars.txt");
@@ -470,12 +451,13 @@ int __stdcall DllMain(void*, int r, void*)
 			);
 		}
 
-		client->HookMethod (36, &hooked_DispatchUserMessage, &orgDispatchUserMessage);
-		engine->HookMethod (20, &hooked_SetViewAngles, &orgSetViewAngles);
-		panel ->HookMethod (41, &hooked_PaintTraverse, &orgPaintTraverse); //you could try hooking Paint.
-		pd	  ->HookMethod (17, &hooked_RunCommand, &orgRunCommand);
+		client	 ->HookMethod (36, &hooked_DispatchUserMessage, &orgDispatchUserMessage);
+		engine	 ->HookMethod (20, &hooked_SetViewAngles, &orgSetViewAngles);
+		panel	 ->HookMethod (41, &hooked_PaintTraverse, &orgPaintTraverse); //you could try hooking Paint.
+		pd		 ->HookMethod (17, &hooked_RunCommand, &orgRunCommand);
+		surface  ->HookMethod (62, &hooked_LockCursor, &orgLockCursor);
 		
-		util::Message("NanoHack 2.0 startup (build " __TIMESTAMP__ ", %s)", mod);
+		util::Message("NanoHack 2.2 startup (build " __TIMESTAMP__ ", %s)", mod);
 		pipe::LoadConfig("generic.cfg");
 	}
 

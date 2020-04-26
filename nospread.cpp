@@ -126,53 +126,30 @@ void nospread::HandleCmd(CUserCmd* cmd, CBaseEntity* w)
 {
 	CBaseEntity* lp = LocalPlayer();
 
-	if (tf2())
-	{
-		static unsigned fakeseed = 0, oldindex = 0;
-
-		if (oldindex != lp->EntIndex())
-		{
-			oldindex = lp->EntIndex();
-			fakeseed = cmd->command_number;
-		}
-
-		if (w && !strcmp(w->GetClientClass()->m_pNetworkName, "CTFMinigun") && chk(cmd->buttons, IN_ATTACK))
-		{
-			static char rseed = MD5_PseudoRandom(188) & 255;
-
-			if (MENU_SMACSEED)
-			{
-				fakeseed++;
-			}
-			else 
-				for (++fakeseed; (MD5_PseudoRandom(fakeseed) & 255) != rseed; ++fakeseed);
-		}
-		else fakeseed++;
-		cmd->command_number = fakeseed;
-	}
-
 	if (aimbot::dummy)
 		return;
 
-	if (MENU_NOSPREAD && chk(cmd->buttons, IN_ATTACK))
-	{
-		if (aimbot::bullet && gmod())
+	if (!tf2()) {
+		if (MENU_NOSPREAD && chk(cmd->buttons, IN_ATTACK))
 		{
-			static CBaseEntity* lw = 0;
-			if (lw != w)
+			if (aimbot::bullet && gmod())
 			{
-				lw = w;
-				hl2ws.Zero();
+				static CBaseEntity* lw = 0;
+				if (lw != w)
+				{
+					lw = w;
+					hl2ws.Zero();
+				}
+
+				prefire = 1;
+				pd->RunCommand(LocalPlayer(), cmd, 0); 
 			}
 
-			prefire = 1;
-		//	pd->RunCommand(LocalPlayer(), cmd, 0); // find better way to do so
+			ApplyBulletSpread(cmd, w, cmd->viewangles, -1.0f);
+
+			if (prefire)
+				prefire = 0;
 		}
-
-		ApplyBulletSpread(cmd, w, cmd->viewangles, -1.0f);
-
-		if (prefire)
-			prefire = 0;
 	}
 }
 

@@ -42,8 +42,8 @@ void gui::RenderInGameOverlay()
 		if (pl == me)
 			continue;
 
-		//if (pl->IsDormant())
-		//	continue;
+		if (pl->IsDormant())
+			continue;
 			
 		if (!pl->IsAlive())
 			continue;
@@ -95,13 +95,13 @@ void gui::RenderInGameOverlay()
 			if (MENU_HPBARESP)
 				draw::Text(esp_x, esp_y, 0, pl->GetHPColor(), "%02i HP", pl->GetHealth());
 
+			//todo: recode
 			if (MENU_STATEESP)
 			{
 				char state[128];
 				int cond = pl->TF2_GetPlayerCond();
 				
 				#define ConfirmState(s)	{ *state = '*'; strcpy(state + strlen(state), s); }
-
 				*state = 0;
 
 				if (tf2())
@@ -111,7 +111,6 @@ void gui::RenderInGameOverlay()
 					alias("Slow", PlayerCond_Slowed	);
 					alias("Disg", PlayerCond_Disguised);
 					alias("Clkd", PlayerCond_Cloaked);
-					alias("Drng", PlayerCond_DeadRingered);
 					alias("Uber", PlayerCond_Ubercharged);
 					alias("Bonk", PlayerCond_Bonked);
 					alias("Tntn", PlayerCond_Taunting);
@@ -121,6 +120,8 @@ void gui::RenderInGameOverlay()
 
 				if (*state == '*')
 					draw::Text(esp_x, esp_y, 0, ESP, state);
+
+				#undef ConfirmState
 			}
 
 			#undef esp_x
@@ -492,7 +493,8 @@ void gui::InitForms()
 		
 		panel->Skip();
 		
-		//AddCheckbox("No spread", MENU_NOSPREAD); Patched in 2014. Useless.
+		if(!tf2())
+			AddCheckbox("No spread", MENU_NOSPREAD); 
 
 		if (tf2()) // deprecated
 			AddCheckbox("SMAC minigun mode", MENU_SMACSEED);
