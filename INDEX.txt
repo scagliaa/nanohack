@@ -1,0 +1,18 @@
+aimbot*        aimbot
+draw.*         drawing functions, abstractions of surface:: functions
+forms.*        FORMS lib, implements GUI elements and stuff
+gui.*          ESP and menu drawing code
+helper.*       few helper functions/macros
+jmp.*          JMP hook source code (written by me in case you're wondering)
+lua.h          header containing all functions for Garry's Mod Lua
+main.*         entrypoint and hooks
+md5.*          MD5, this was taken out of Source SDK
+menu.h         has macros for menu variables
+namestealer.*  namestealer source with DarkRP and SMAC bypass modes
+netvars.*      datatable/network variable manager
+nospread.*     nospread source for GMOD, CSS and TF2. ALso contains FireBullets gmod hook.
+pipe.*         was supposed to have loader communication API but never did, so it only has config load/save functions
+sdk.*          Source SDK written specifically for this cheat
+util.*         bunch of functions for internal use by cheat
+vector.h       Vector class LuaStoned gave me in past, also contains  vector rotation (through matrix) function i reversed from gmod
+vmt.*          simple class for managing VMTs

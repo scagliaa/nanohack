@@ -1,0 +1,65 @@
+#pragma once
+
+#define	MENU_NOSPREAD	menu[0]
+#define	MENU_AIMBOTEN	menu[1]
+#define	MENU_AUTOSTRF	menu[2]
+#define	MENU_PROPKILL	menu[3]
+#define	MENU_NORECOIL	menu[4]
+#define	MENU_ENEMYESP	menu[5]
+#define	MENU_NOVISREC	menu[6]
+#define	MENU_CALLVOTE	menu[7]
+#define	MENU_ESPNAMES	menu[8]
+#define	MENU_CROSHAIR	menu[9]
+#define	MENU_BUNNYHOP	menu[10]
+#define	MENU_BHOPSAFE	menu[11]
+#define	MENU_NOSETVRC	menu[12]
+#define	MENU_SMACSEED	menu[13]
+#define	MENU_STEAMBRO	menu[14]
+#define	MENU_HPBARESP	menu[15]
+#define	MENU_RAGEBOTN	menu[16] // deprecated
+#define	MENU_WEAPONWH	menu[17]
+#define	MENU_SPEEDHAK	menu[18]
+#define	MENU_OVERSPED	menu[19]
+#define	MENU_ENTITYWH	menu[20]
+#define	MENU_INTERFRN	menu[21]
+#define	MENU_RAGEBOTE	menu[22]
+#define	MENU_SEMIFULL	menu[23]
+#define	MENU_SEMIDKTR	menu[24] // deprecated
+#define	MENU_AIMBOTKB	menu[25]
+#define	MENU_AIM4TEAM	menu[26]
+#define	MENU_BONESCAN	menu[27]
+#define	MENU_AUTOSHOT	menu[28]
+#define	MENU_AUTOWALL	menu[29]
+#define	MENU_AIMGLASS	menu[30]
+#define	MENU_FAKEVIEW	menu[31]
+#define	MENU_WALKBOST	menu[32]
+#define	MENU_PRIORSYS	menu[33]
+#define	MENU_FASTWALK	menu[34]
+#define	MENU_CLASSESP	menu[35]
+#define	MENU_FAKEDUCK	menu[36]
+#define	MENU_AAPROXYX	menu[37] // deprecated
+#define	MENU_AAPROXYY	menu[38] // deprecated
+#define	MENU_ANTIAIMB	menu[39] // deprecated
+#define	MENU_SMACAIMB	menu[40]
+#define	MENU_AIMBSPOT	menu[41]
+#define	MENU_NAMESTLR	menu[42]
+#define	MENU_WALLBANG	menu[43] // deprecated
+#define	MENU_NMSTSWAP	menu[44]
+#define	MENU_STATEESP	menu[45]
+#define	MENU_NOMOVMNT	menu[46]
+#define	MENU_NPCLAGCP	menu[47]
+#define	MENU_NMSTTEAM	menu[48]
+#define	MENU_RADARRDS	menu[49] // deprecated
+#define	MENU_SPAWPROT	menu[50]
+#define	MENU_NPCAIMBT	menu[51]
+#define	MENU_CHATSPAM	menu[52]
+#define	MENU_AUTORELD	menu[53]
+#define	MENU_AUTOSTAB	menu[54]
+#define	MENU_DARKRPNM	menu[55]
+#define	MENU_FAKELAGB	menu[56]
+#define	MENU_FAKELAGN	menu[57]
+#define	MENU_FAKELAGA	menu[58]
+#define	MENU_FAKELAGS	menu[59]
+#define	MENU_DRAWBBOX	menu[60] // not implemented
+#define	MENU_AAPROXYA	menu[61] // deprecated
+#define	MENU_ANTIFLAG	menu[62] // deprecated

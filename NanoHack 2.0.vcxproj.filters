@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="pipe.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="md5.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="netvars.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="nospread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="aimbot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="forms.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="namestealer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="jmp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="helper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="draw.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pipe.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="vmt.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="nospread.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="netvars.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="aimbot.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="lua.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="forms.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="namestealer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="jmp.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
