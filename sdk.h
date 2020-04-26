@@ -358,8 +358,6 @@ public:
 	DECLFUNCA(8,	bool,			IsDormant,		(), (void*), ((void**)this + 2), (void**)this + 2);
 	DECLFUNCA(9,	int,			EntIndex,		(), (void*), ((void**)this + 2), (void**)this + 2);
 	DECLFUNCA(9,	void*,			GetModel,		(), (void*), ((void**)this + 1), (void**)this + 1);
-	
-
 
 	static studiohitboxset*	hboxset;
 	static matrix3x4		matrix[BONE_ARRAY];
@@ -596,6 +594,7 @@ public:
 	}
 };
 
+
 class FilterGeneric
 {
 	CBaseEntity* hIgnore;
@@ -666,6 +665,15 @@ INTERFACE(Trace)
 		(void*, const ray&, int, void*, rt*),
 		(THIS, r, msk, flt, tr)
 	);
+};
+
+INTERFACE(PlayerInfoManager)
+{
+	if (Init("server", "PlayerInfoManager"))
+	{
+	}
+}
+	DECLFUNC(1, GlobalVars*, GetGlobalVars, (), (void*), (THIS));
 };
 
 INTERFACE(Physics)

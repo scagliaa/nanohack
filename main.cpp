@@ -14,6 +14,7 @@ IModelInfo*	mdlinfo	= 0;
 ILuaShared* glua	= 0;
 GlobalVars*	globals	= 0;
 IInputSystem* isystem = 0;
+IPlayerInfoManager* iplayer = 0;
 
 // IGameEventManager*	evmgr	= 0;
 IPrediction*pd		= 0;
@@ -267,70 +268,42 @@ DECLVHOOK(void, SetViewAngles, (Vector &a))
 
 	if (MENU_NOSETVRC)
 	{
-		if (gmod())
-		{
-			if (cmd && cmd->tick_count == 0 && cmd->predicted)
-				return;
-		}
-
-		if (dod())
-		{
-			if (get_SI<CBaseEntity*>() == LocalPlayer())
-				return;
-		}
+		if (gmod()){if (cmd && cmd->tick_count == 0 && cmd->predicted)return;}
+		if (dod()){if (get_SI<CBaseEntity*>() == LocalPlayer())return;}
 	}
-
 	orgSetViewAngles(a);
-	
-	/**
-	cl move recursion
-	**/
-
 	if (cmd && cmd->command_number == *sequence_number)
 	{
 		static int i = 0;
-
 		if (MENU_OVERSPED && util::IsKeyDown(MENU_SPEEDHAK) && i-- > 0)
 			*(****get_BP<unsigned long*****>() + 1) -= 5;
 		else
 			i = MENU_OVERSPED;
-
 		CreateMove(cmd);
-
 		*sequence_number = cmd->command_number;
 		*(***get_BP<bool****>() - 1) &= sendPacket;
-
-		// csgo: register (BL) bool bSendPacket
 	}
 }
 DECLVHOOK(void, RunCommand, (CBaseEntity* pl, CUserCmd* cmd, void* mv))
 {
-	
 	__asm push ecx
-
 	static int tick_count = 0;
-
 	bool norun = tick_count == cmd->tick_count;
 	tick_count = cmd->tick_count;
-
 	__asm pop ecx
-
 	if (norun)
 	{
 		static int o_predcmd = 0;
 		if (!o_predcmd)
 			o_predcmd = *(int*)(util::FindPattern(pd->GetMethod(17), 0x64, "\x89?????\xE8") + 2);
-
 		WritePtr<CUserCmd*>(pl, o_predcmd, cmd);
 		char md[0xA4];
-
 		pd->SetupMove(pl, cmd, md);
 		movement->ProcessMovement(pl, md);
 		pd->FinishMove(pl, cmd, md);
 	}
 	else
 		orgRunCommand(pl, cmd, mv);
-		
 }
 static bool open_menu = 0; 
 DECLVHOOK(void, PaintTraverse, (unsigned p, void* a2, void* a3))
@@ -388,78 +361,61 @@ int __stdcall DllMain(void*, int r, void*)
 	if (r == 1 /* && OpenMutex(1, 1, "/nhmtx") */)
 	{
 		memset(menu, 0, sizeof(menu));
-
 		char* mod = pipe::ModQuery();
 		pipe::log = pipe::OpenFile("beta/nanohack.log", "a");
-	
-		panel	= new IPanel();
-		surface	= new ISurface();
-
-		client	= new IClient();
-		
+		panel = new IPanel();
+		surface = new ISurface();
+		client = new IClient();
 		input = new EInterface(**(unsigned long**)(util::FindPattern(client->GetMethod(21), 0x100, "\x8B\x0D") + 2));
 		input->HookMethod(8, hooked_GetUserCmd, 0);
-
 		memcpy(hooked_GetUserCmd, (void*)input->GetMethod(8), 0x64);
-		memset((void*)(util::FindPatternComplex((unsigned long)hooked_GetUserCmd, 0x64, 2,
-			"\x0F\x95?",
-			"\x0F\x45?"
-			) - 3), 0x90, 3);
-
+		memset((void*)(util::FindPatternComplex((unsigned long)hooked_GetUserCmd, 0x64, 2, "\x0F\x95?", "\x0F\x45?") - 3), 0x90, 3);
 		DWORD unused;
 		VirtualProtect(hooked_GetUserCmd, sizeof(hooked_GetUserCmd), PAGE_EXECUTE_READWRITE, &unused);
+		trace = new ITrace();
+		engine = new IEngine();
+		physics = new IPhysics();
+		ents = new IEntities();
+		mdlinfo = new IModelInfo();
 
-		trace	= new ITrace();
-		engine	= new IEngine();
-		physics	= new IPhysics();
-		ents	= new IEntities();
-		mdlinfo	= new IModelInfo();
-	
-		movement= new IMovement();
-		pd		= new IPrediction();
+		movement = new IMovement();
+		pd = new IPrediction();
 		isystem = new IInputSystem();
-
+		iplayer = new IPlayerInfoManager();
 		globals = **(GlobalVars***)util::FindPatternComplex(client->GetMethod(0), 0x64, 3,
-				"\x89\x0D",
-				"\x51\xA3",
-				"\x10\xA3"
-			);
-
+			"\x89\x0D",
+			"\x51\xA3",
+			"\x10\xA3"
+		);
 		Netvars::Initialize();
 		Netvars::Dump("nanohack/netvars.txt");
 		//Netvars::HookNetvar("*", "m_angEyeAngles[0]", antiaim::Proxy_X);
 		//Netvars::HookNetvar("*", "m_angEyeAngles[1]", antiaim::Proxy_Y);
 		// antiaim was deprecated from this build.
 		Netvars::HookNetvar("DT_LocalPlayerExclusive", "m_nTickBase", fix_nTickBase);
-
 		if (css())
 		{
 			Netvars::HookNetvar("DT_CSPlayer", "m_flFlashMaxAlpha", gui::Proxy_FlashSmoke);
 			Netvars::HookNetvar("DT_ParticleSmokeGrenade", "m_flSpawnTime", gui::Proxy_FlashSmoke);
 		}
-
 		if (tf2())
 			Netvars::HookNetvar("DT_TFPlayerShared", "m_nPlayerCond", gui::Proxy_Jarate);
-
 		if (gmod())
 		{
 			extern JMP* jmpFireBullets;
-			extern void __fastcall hooked_FireBullets(CBaseEntity* ecx, void*, char* fb);
+			extern void __fastcall hooked_FireBullets(CBaseEntity * ecx, void*, char* fb);
 			jmpFireBullets = new JMP(
 				(void*)util::FindPattern("client", "\x53\x8B\xDC\x83\xEC\x08\x83\xE4\xF0\x83\xC4\x04\x55\x8B\x6B\x04\x89\x6C\x24\x04\x8B\xEC\x81\xEC????\x56\x8B\x73\x08"),
 				(void*)hooked_FireBullets
 			);
 		}
-
-		client	 ->HookMethod (36, &hooked_DispatchUserMessage, &orgDispatchUserMessage);
-		engine	 ->HookMethod (20, &hooked_SetViewAngles, &orgSetViewAngles);
-		panel	 ->HookMethod (41, &hooked_PaintTraverse, &orgPaintTraverse); //you could try hooking Paint.
-		pd		 ->HookMethod (17, &hooked_RunCommand, &orgRunCommand);
-		surface  ->HookMethod (62, &hooked_LockCursor, &orgLockCursor);
-		
+		client->HookMethod(36, &hooked_DispatchUserMessage, &orgDispatchUserMessage);
+		engine->HookMethod(20, &hooked_SetViewAngles, &orgSetViewAngles);
+		panel->HookMethod(41, &hooked_PaintTraverse, &orgPaintTraverse); //you could try hooking Paint.
+		pd->HookMethod(17, &hooked_RunCommand, &orgRunCommand);
+		surface->HookMethod(62, &hooked_LockCursor, &orgLockCursor);
 		util::Message("NanoHack 2.2 startup (build " __TIMESTAMP__ ", %s)", mod);
 		pipe::LoadConfig("generic.cfg");
 	}
-
 	return 1;
 }

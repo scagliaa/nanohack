@@ -34,7 +34,6 @@ namespace draw
 	void	Rect(int x0, int y0, int x1, int y1, unsigned color);
 	void	OutlinedRect(int x0, int y0, int x1, int y1, unsigned color);
 	void	Text(int x, int y, int align, unsigned color, const char* text, ...);
-
 	
 	inline void OutlinedOutlinedRect(int x0, int y0, int x1, int y1, unsigned color)
 	{

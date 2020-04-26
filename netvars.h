@@ -14,6 +14,7 @@ extern int m_vecViewOffset0;
 extern int m_vecVelocity0;
 extern int m_angEyeAngles0;
 extern int m_nTickBase;
+extern int m_angRotation;
 extern int m_flNextPrimaryAttack;
 extern int m_iClip1;
 extern int m_iState;

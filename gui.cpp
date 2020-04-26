@@ -91,7 +91,7 @@ void gui::RenderInGameOverlay()
 
 			if (tf2() && MENU_CLASSESP)
 				draw::Text(esp_x, esp_y, 0, ESP, pl->TF2_GetClass());
-				
+
 			if (MENU_HPBARESP)
 				draw::Text(esp_x, esp_y, 0, pl->GetHPColor(), "%02i HP", pl->GetHealth());
 
@@ -482,9 +482,9 @@ void gui::InitForms()
 
 		panel->Skip();
 		
-		AddCheckbox("NP aimbot", MENU_NPCAIMBT);
-		AddCheckbox("Aim at Steam friends", MENU_STEAMBRO);
-		AddCheckbox("Aim through breakables", MENU_AIMGLASS);
+		AddCheckbox("Aim @ NPCs", MENU_NPCAIMBT);
+		AddCheckbox("Aim @ Friends", MENU_STEAMBRO);
+		AddCheckbox("Aim @ Breakables", MENU_AIMGLASS);
 		
 		panel->AddSplitter("Accuracy");
 		
