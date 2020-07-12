@@ -63,3 +63,4 @@
 #define	MENU_DRAWBBOX	menu[60] // not implemented
 #define	MENU_AAPROXYA	menu[61] // deprecated
 #define	MENU_ANTIFLAG	menu[62] // deprecated
+#define MENU_ESPBOX		menu[63]
