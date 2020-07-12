@@ -30,150 +30,205 @@ void gui::Proxy_Jarate(const RecvProxyData* i, CBaseEntity* pl, int* o)
 
 void gui::RenderInGameOverlay()
 {
-	int maxpl = globals->max_clients;
-	int maxen = ents->GetHighestEntityIndex();
+	const auto maxpl = globals->max_clients;
+	const auto maxen = ents->GetHighestEntityIndex();
 
-	CBaseEntity* me = LocalPlayer();
-	int myteam = me->GetTeam();
-	
-	if (MENU_ENEMYESP) for (int i = 1; i <= maxpl; ++i)
-	if (CBaseEntity* pl = ents->GetClientEntity(i))
+	auto me = LocalPlayer();
+	const auto myteam = me->GetTeam();
+
+	if (MENU_ENEMYESP)
 	{
-		if (pl == me)
-			continue;
-
-		if (pl->IsDormant())
-			continue;
-			
-		if (!pl->IsAlive())
-			continue;
-		
-		if (!pl->GetModel())
-			continue;
-		
-		int plteam = pl->GetTeam();
-		if (MENU_ENEMYESP == 1 || ((MENU_ENEMYESP == 2 && myteam != plteam) || (MENU_ENEMYESP == 3 && myteam == plteam)))
+		for (auto i = 1; i <= maxpl; ++i)
 		{
-			Vector vec = pl->GetAbsCenter(), svec;
-			draw::ToScreen(vec, svec);
-
-			unsigned long ESP = pl->GetESPColor();
-
-			int n_lines = 0;
-
-			#define esp_x svec.x
-			#define esp_y svec.y + (n_lines++) * 12
-
-			if (MENU_ESPNAMES) 
-				draw::Text(esp_x, esp_y, 0, ESP, pl->GetNickSafe());
-
-
-			if (MENU_WEAPONWH)
-			if (CBaseEntity* w = pl->GetActiveWeapon())
+			if (auto pl = ents->GetClientEntity(i))
 			{
-				char wname[256]; strcpy(wname, w->GetClassname());
-				#define	filter(w) if (char* kw = strstr(wname, w)) strcpy(kw, kw + strlen(w))
-				filter("weapon");
-				if (tf2())
+				if (pl == me)
 				{
-					filter("tf");
-					filter("hwg");
-					filter("medic");
-					filter("primary");
+					continue;
 				}
-				draw::Text(esp_x, esp_y, 0, ESP, util::MakeFancy(wname));
-			}
-			else
-				draw::Text(esp_x, esp_y, 0, ESP, "**Weaponless**");
 
-			if (tf2() && MENU_CLASSESP)
-				draw::Text(esp_x, esp_y, 0, ESP, pl->TF2_GetClass());
-
-			if (MENU_HPBARESP)
-				draw::Text(esp_x, esp_y, 0, pl->GetHPColor(), "%02i HP", pl->GetHealth());
-
-			//todo: recode
-			if (MENU_STATEESP)
-			{
-				char state[128];
-				int cond = pl->TF2_GetPlayerCond();
-				#define ConfirmState(s)	{ *state = '*'; strcpy(state + strlen(state), s); }
-				*state = 0;
-				if (tf2())
+				if (pl->IsDormant())
 				{
-					#define alias(a, c) if (chk(cond, c)) ConfirmState(a)
-					alias("Slow", PlayerCond_Slowed	);
-					alias("Disg", PlayerCond_Disguised);
-					alias("Clkd", PlayerCond_Cloaked);
-					alias("Uber", PlayerCond_Ubercharged);
-					alias("Bonk", PlayerCond_Bonked);
-					alias("Tntn", PlayerCond_Taunting);
-					#undef alias
+					continue;
 				}
-				if (*state == '*')
-					draw::Text(esp_x, esp_y, 0, ESP, state);
-				#undef ConfirmState
+
+				if (!pl->IsAlive())
+				{
+					continue;
+				}
+
+				if (!pl->GetModel())
+				{
+					continue;
+				}
+
+				const auto plteam = pl->GetTeam();
+				
+				if (MENU_ENEMYESP == 1 || ((MENU_ENEMYESP == 2 && myteam != plteam) || (MENU_ENEMYESP == 3 && myteam ==
+					plteam)))
+				{
+					auto vec = pl->GetAbsCenter();
+					Vector svec;
+					draw::ToScreen(vec, svec);
+
+					const unsigned long ESP = pl->GetESPColor();
+
+					auto do_box = [&](const unsigned long clr)
+					{
+						Vector mon;
+						auto nom = pl->GetAbsOrigin();
+
+						constexpr auto CROUCH{50.f};
+						constexpr auto STAND{70.f};
+
+						pl->GetFlags() & FL_DUCKING
+							? mon = nom + Vector(0, 0, CROUCH)
+							: mon = nom + Vector(0, 0, STAND);
+
+						Vector bot;
+						Vector top;
+
+						draw::ToScreen(nom, bot);
+						draw::ToScreen(mon, top);
+
+						const auto h = (bot.y - top.y) + 5;
+						const auto w = h / 4.5f;
+
+						draw::OutlinedRect(top.x - w, top.y, w * 2, (bot.y - top.y), clr);
+					};
+
+					auto n_lines = 0;
+
+#define esp_x svec.x
+#define esp_y svec.y + (n_lines++) * 12
+
+					if (MENU_ESPBOX)
+						do_box(ESP);
+
+					if (MENU_ESPNAMES)
+						draw::Text(esp_x, esp_y, 0, ESP, pl->GetNickSafe());
+
+					if (MENU_WEAPONWH)
+					{
+						if (CBaseEntity * w = pl->GetActiveWeapon())
+						{
+							char wname[256];
+							strcpy(wname, w->GetClassname());
+#define	filter(w) if (char* kw = strstr(wname, w)) strcpy(kw, kw + strlen(w))
+							filter("weapon");
+							if (tf2())
+							{
+								filter("tf");
+								filter("hwg");
+								filter("medic");
+								filter("primary");
+							}
+							draw::Text(esp_x, esp_y, 0, ESP, util::MakeFancy(wname));
+						}
+						else
+							draw::Text(esp_x, esp_y, 0, ESP, "**Weaponless**");
+					}
+
+					if (tf2() && MENU_CLASSESP)
+						draw::Text(esp_x, esp_y, 0, ESP, pl->TF2_GetClass());
+
+					if (MENU_HPBARESP)
+						draw::Text(esp_x, esp_y, 0, pl->GetHPColor(), "%02i HP", pl->GetHealth());
+
+					//todo: recode
+					if (MENU_STATEESP)
+					{
+						char state[128];
+						auto cond = pl->TF2_GetPlayerCond();
+#define ConfirmState(s)	{ *state = '*'; strcpy(state + strlen(state), s); }
+						*state = 0;
+						if (tf2())
+						{
+#define alias(a, c) if (chk(cond, c)) ConfirmState(a)
+							alias("Slow", PlayerCond_Slowed);
+							alias("Disg", PlayerCond_Disguised);
+							alias("Clkd", PlayerCond_Cloaked);
+							alias("Uber", PlayerCond_Ubercharged);
+							alias("Bonk", PlayerCond_Bonked);
+							alias("Tntn", PlayerCond_Taunting);
+#undef alias
+						}
+						if (*state == '*')
+							draw::Text(esp_x, esp_y, 0, ESP, state);
+#undef ConfirmState
+					}
+#undef esp_x
+#undef esp_y
+				}
 			}
-			#undef esp_x
-			#undef esp_y
 		}
 	}
 
-	if (MENU_ENTITYWH) 
-		for (int i = maxpl + 1; i <= maxen; ++i)
-	if (CBaseEntity* e = ents->GetClientEntity(i))
+	if (MENU_ENTITYWH)
 	{
-		if (e->IsDormant())
-			continue;
+		for (auto i = maxpl + 1; i <= maxen; ++i)
+		{
+			if (auto e = ents->GetClientEntity(i))
+			{
+				if (e->IsDormant())
+				{
+					continue;
+				}
 
-		if (!e->GetModel())
-			continue;
+				if (!e->GetModel())
+				{
+					continue;
+				}
 
-		ClientClass* cl = e->GetClientClass();
-		Vector sorigin;
-			
-		if (!cl)
-			continue;
-			
-		const char* cclass = cl->m_pNetworkName;
-		
-		if (!cclass)
-			continue;
+				const auto cl = e->GetClientClass();
+				Vector sorigin;
 
-		#define	TEAM_COLOR(E) (E->GetTeam() == TEAM_RED ? CC_LIGHTRED : (E->GetTeam() == TEAM_BLU ? CC_LIGHTBLUE : CC_GREEN))
+				if (cl == nullptr)
+				{
+					continue;
+				}
 
-		#define RegEntityESP(CLASS, ICON) if (!strcmp(cclass, #CLASS))\
+				const auto cclass = cl->m_pNetworkName;
+
+				if (cclass == nullptr)
+				{
+					continue;
+				}
+
+#define	TEAM_COLOR(E) (E->GetTeam() == TEAM_RED ? CC_LIGHTRED : (E->GetTeam() == TEAM_BLU ? CC_LIGHTBLUE : CC_GREEN))
+
+#define RegEntityESP(CLASS, ICON) if (!strcmp(cclass, #CLASS))\
 		{\
 			draw::ToScreen(e->GetAbsCenter(), sorigin);\
 			draw::Text(sorigin.x, sorigin.y, 1, TEAM_COLOR(e), ICON);\
 			continue;\
 		}
 
-		#define RegSpecificESP(CLASS, ICON, COLOR) if (!strcmp(cclass, #CLASS))\
+#define RegSpecificESP(CLASS, ICON, COLOR) if (!strcmp(cclass, #CLASS))\
 		{\
 			draw::ToScreen(e->GetAbsCenter(), sorigin);\
 			draw::Text(sorigin.x, sorigin.y, 1, COLOR, ICON);\
 			continue;\
 		}
 
-		if (css())
-		{
-			RegSpecificESP(CC4, "[C4]", CC_LIGHTRED);
-			RegSpecificESP(CPlantedC4, "[*C4]", CC_RED);
-			RecvTable* p = cl->m_pRecvTable->m_pProps[0].m_pDataTable;
-			if (p && strstr(p->m_pNetTableName, "Weapon") && !ReadPtr<char>(e, m_iState))
-			{
-				char wname[128];
-				strcpy(wname, e->GetClassname());
+				if (css())
+				{
+					RegSpecificESP(CC4, "[C4]", CC_LIGHTRED);
+					RegSpecificESP(CPlantedC4, "[*C4]", CC_RED);
+					auto p = cl->m_pRecvTable->m_pProps[0].m_pDataTable;
+					if (p && (strstr(p->m_pNetTableName, "Weapon") != nullptr) && (ReadPtr<char>(e, m_iState) == 0))
+					{
+						char wname[128];
+						strcpy(wname, e->GetClassname());
 
-				draw::ToScreen(e->GetAbsCenter(), sorigin);
-				draw::Text(sorigin.x, sorigin.y, 1, CC_GREY, util::MakeFancy(wname));
-			}
-		}
+						draw::ToScreen(e->GetAbsCenter(), sorigin);
+						draw::Text(sorigin.x, sorigin.y, 1, CC_GREY, util::MakeFancy(wname));
+					}
+				}
 
-		if (tf2())
-		{
-			#define RegStructureESP(CLASS, ICON) if (!strcmp(cclass, #CLASS))\
+				if (tf2())
+				{
+#define RegStructureESP(CLASS, ICON) if (!strcmp(cclass, #CLASS))\
 			{\
 				draw::ToScreen(e->GetAbsCenter(), sorigin);\
 				draw::Text(sorigin.x, sorigin.y, 1, TEAM_COLOR(e), "%s", ICON);\
@@ -182,62 +237,66 @@ void gui::RenderInGameOverlay()
 				continue;\
 			}
 
-			if (!strcmp(cclass, "CBaseAnimating"))
-			{
-				const char* mdl = mdlinfo->GetModelName(e->GetModel());
-				
-				if (strstr(mdl, "ammopack"))
-				{
-					draw::ToScreen(e->GetAbsCenter(), sorigin);
-					draw::Text(sorigin.x, sorigin.y, 1, CC_GREY, "Ammo");
+					if (strcmp(cclass, "CBaseAnimating") == 0)
+					{
+						const auto mdl = mdlinfo->GetModelName(e->GetModel());
+
+						if (strstr(mdl, "ammopack") != nullptr)
+						{
+							draw::ToScreen(e->GetAbsCenter(), sorigin);
+							draw::Text(sorigin.x, sorigin.y, 1, CC_GREY, "Ammo");
+						}
+
+						if (strstr(mdl, "medkit") != nullptr)
+						{
+							draw::ToScreen(e->GetAbsCenter(), sorigin);
+							draw::Text(sorigin.x, sorigin.y, 1, CC_LIGHTGREEN, "Medkit");
+						}
+
+						continue;
+					}
+
+					RegEntityESP(CZombie, "Skeleton");
+					RegEntityESP(CTFRobotDestruction_Robot, "Robot");
+					RegSpecificESP(CTFAmmoPack, "Debris", CC_GREY);
+
+					RegSpecificESP(CTFTankBoss, "Tank", CC_LIGHTBLUE);
+					RegSpecificESP(CMerasmus, "Merasmus", COLOR(100, 225, 100));
+					RegSpecificESP(CEyeballBoss, "Monoculus", CC_LIGHTBLUE);
+					RegSpecificESP(CHeadlessHatman, "Headless Hatman", COLOR(170, 0, 225));
+
+					RegStructureESP(CObjectSentrygun, "Sentry");
+					RegStructureESP(CObjectDispenser, "Dispenser");
+					RegStructureESP(CObjectTeleporter, "Teleporter");
+
+					if (!strcmp(cclass, "CTFGrenadePipebombProjectile"))
+					{
+						draw::ToScreen(e->GetAbsCenter(), sorigin);
+						draw::Text(sorigin.x, sorigin.y, 1, TEAM_COLOR(e),
+						           ReadPtr<int>(e, m_iType) != 0 ? "<^>" : "[_|)");
+
+						continue;
+					}
+					if (e->IsDummyProjectile())
+						continue;
+
+					RegEntityESP(CTFStunBall, "(_)");
+					RegEntityESP(CTFFlameRocket, "~|_)");
+					RegEntityESP(CTFProjectile_Arrow, "-===>");
+					RegEntityESP(CTFProjectile_Rocket, "[==)>");
+					RegEntityESP(CTFProjectile_EnergyBall, "--=o}");
+					RegEntityESP(CTFProjectile_HealingBolt, "=====");
+					RegEntityESP(CTFProjectile_SentryRocket, "=> =>");
 				}
-
-				if (strstr(mdl, "medkit"))
-				{
-					draw::ToScreen(e->GetAbsCenter(), sorigin);
-					draw::Text(sorigin.x, sorigin.y, 1, CC_LIGHTGREEN, "Medkit");
-				}
-
-				continue;
 			}
-
-			RegEntityESP(CZombie,		"Skeleton");
-			RegEntityESP(CTFRobotDestruction_Robot, "Robot");
-			RegSpecificESP(CTFAmmoPack, "Debris", CC_GREY);
-
-			RegSpecificESP(CTFTankBoss,		"Tank",				CC_LIGHTBLUE);
-			RegSpecificESP(CMerasmus,		"Merasmus",			COLOR(100, 225, 100));
-			RegSpecificESP(CEyeballBoss,	"Monoculus",		CC_LIGHTBLUE);
-			RegSpecificESP(CHeadlessHatman,	"Headless Hatman",	COLOR(170, 0, 225));
-				
-			RegStructureESP(CObjectSentrygun,	"Sentry");
-			RegStructureESP(CObjectDispenser,	"Dispenser");
-			RegStructureESP(CObjectTeleporter,	"Teleporter");
-				
-			if (!strcmp(cclass, "CTFGrenadePipebombProjectile"))
-			{
-				draw::ToScreen(e->GetAbsCenter(), sorigin);
-				draw::Text(sorigin.x, sorigin.y, 1, TEAM_COLOR(e),
-					ReadPtr<int>(e, m_iType) ? "<^>" : "[_|)");
-				
-				continue;
-			}
-			if (e->IsDummyProjectile())
-				continue;
-
-			RegEntityESP(CTFStunBall,					"(_)");
-			RegEntityESP(CTFFlameRocket,				"~|_)");
-			RegEntityESP(CTFProjectile_Arrow,			"-===>");
-			RegEntityESP(CTFProjectile_Rocket,			"[==)>");
-			RegEntityESP(CTFProjectile_EnergyBall,		"--=o}");
-			RegEntityESP(CTFProjectile_HealingBolt,		"=====");
-			RegEntityESP(CTFProjectile_SentryRocket,	"=> =>");
 		}
 	}
 
 	if (MENU_CROSHAIR)
 	{
-		int cx, cy;
+		int cx;
+		int cy;
+		
 		engine->GetScreenSize(cx, cy);
 
 		cx /= 2;
@@ -261,54 +320,70 @@ void rage_Open(forms::F_ComboBox* box)
 	box->AddItem("");
 
 	if (engine->IsInGame())
-	for (int i = 1, lp = engine->GetLocalPlayer(); i <= globals->max_clients; ++i)
 	{
-		if (i == lp)
+		for (auto i = 1, lp = engine->GetLocalPlayer(); i <= globals->max_clients; ++i)
 		{
-			continue;
+			if (i == lp)
+			{
+				continue;
+			}
+
+			auto pl = ents->GetClientEntity(i);
+
+			if (pl == nullptr)
+			{
+				continue;
+			}
+
+			const auto name = pl->GetNickSafe();
+
+			if (name == nullptr)
+			{
+				continue;
+			}
+
+			box->AddItem(name);
 		}
-
-		CBaseEntity* pl = ents->GetClientEntity(i);
-
-		if (!pl)
-		{
-			continue;
-		}
-
-		const char* name = pl->GetNickSafe();
-
-		if (!name)
-			continue;
-
-		box->AddItem(name);
 	}
 }
 
 int rage_Select(forms::F_ComboBox* box)
 {
 	if (!box->item_selected)
+	{
 		return 0;
+	}
 
 	if (engine->IsInGame())
-	for (int i = 1, j = 1, lp = engine->GetLocalPlayer(); i <= globals->max_clients; ++i)
 	{
-		if (i == lp)
-			continue;
+		for (auto i = 1, j = 1, lp = engine->GetLocalPlayer(); i <= globals->max_clients; ++i)
+		{
+			if (i == lp)
+			{
+				continue;
+			}
 
-		CBaseEntity* pl = ents->GetClientEntity(i);
+			auto pl = ents->GetClientEntity(i);
 
-		if (!pl)
-			continue;
+			if (!pl)
+			{
+				continue;
+			}
 
-		const char* name = pl->GetNickSafe();
+			const auto name = pl->GetNickSafe();
 
-		if (!name)
-			continue;
+			if (!name)
+			{
+				continue;
+			}
 
-		if (j == box->item_selected)
-			return pl->EntIndex();
+			if (j == box->item_selected)
+			{
+				return pl->EntIndex();
+			}
 
-		j++;
+			j++;
+		}
 	}
 
 	return 0;
@@ -542,7 +617,8 @@ void gui::InitForms()
 		AddCheckbox("NP ESP", MENU_ENTITYWH);
 
 		panel->Skip();
-		
+
+		AddCheckbox("Draw box", MENU_ESPBOX)
 		AddCheckbox("Draw name", MENU_ESPNAMES);
 		AddCheckbox("Draw health", MENU_HPBARESP);
 		AddCheckbox("Draw weapon", MENU_WEAPONWH);
