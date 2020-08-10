@@ -324,15 +324,18 @@ DECLVHOOK(void, SetViewAngles, (Vector &a))
 	
 	if ((cmd != nullptr) && cmd->command_number == *sequence_number)
 	{
-		static auto i = 0;
-		if (MENU_OVERSPED && util::IsKeyDown(MENU_SPEEDHAK) && i-- > 0)
+		auto extra_queue = [&]()
 		{
-			*(****get_BP<unsigned long*****>() + 1) -= 5;
-		}
-		else
-		{
-			i = MENU_OVERSPED;
-		}
+			static auto i = 0;
+			if (MENU_OVERSPED && util::IsKeyDown(MENU_SPEEDHAK) && i-- > 0)
+			{
+				*(****get_BP<unsigned long*****>() + 1) -= 5;
+			}
+			else
+			{
+				i = MENU_OVERSPED;
+			}
+		};
 		
 		create_move(cmd);
 		
