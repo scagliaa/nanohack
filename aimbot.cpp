@@ -82,7 +82,8 @@ int real_flags = 0, next_flags = 0;
 void aimbot::PerformPrediction(CUserCmd* cmd)
 {
 	nospread::recoil = lp->GetViewPunch();
-	static int o_predcmd = 0;
+	static auto o_predcmd = 0;
+	
 	if (!o_predcmd)
 		o_predcmd = *(int*)(util::FindPattern(pd->GetMethod(17), 0x64, "\x89?????\xE8") + 2);
 
@@ -99,8 +100,7 @@ void aimbot::PerformPrediction(CUserCmd* cmd)
 	next_flags = ReadPtr<int>(lp, m_fFlags);
 
 	WritePtr<CUserCmd*>(lp, o_predcmd, 0);
-
-	// todo: check
+	
 	GetVFunc<void (__thiscall*)(void*)>(lp, 9)(lp);
 }
 
@@ -147,7 +147,9 @@ inline bool Penetrate(float &distance, Vector &start, Vector &dir, Vector &end, 
 		trace->TraceRay(ray(end - dir * step * 2.f, end), MASK_SOLID, 0, &r);
 
 		if (r.contents & MASK_SOLID)
-			return 1;
+		{
+			return true;
+		}
 	}
 
 	return 0;
@@ -156,21 +158,27 @@ inline bool Penetrate(float &distance, Vector &start, Vector &dir, Vector &end, 
 void aimbot::Update()
 {
 	lp		= LocalPlayer();
-	dummy	= 1;
+	dummy	= true;
 
-	if (ragebot && (!ents->GetClientEntity(ragebot) || ragebot > globals->max_clients))
+	if ((ragebot != 0) && (!ents->GetClientEntity(ragebot) || ragebot > globals->max_clients))
+	{
 		ragebot = 0;
+	}
 
 	if (dod() && !lp->IsOnGround())
+	{
 		return;
-	
-	CBaseEntity* w = lp->GetActiveWeapon();
+	}
 
-	if (!w || !w->GetClip1() || w->IsReloading() || w->IsMelee())
+	auto w = lp->GetActiveWeapon();
+
+	if ((w == nullptr) || (w->GetClip1() == 0) || w->IsReloading() || w->IsMelee())
+	{
 		return;
+	}
 
 	bullet	= !(w->GetNextPrimaryFire() > globals->cur_time);
-	dummy	= 0;
+	dummy	= false;
 }
 
 BulletFilter* bf;
