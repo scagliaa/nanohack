@@ -1,8 +1,8 @@
 /*
 
-  ______                                  
- |  ____|                                 
- | |__     ___    _ __   _ __ ___    ___ 
+  ______
+ |  ____|
+ | |__     ___    _ __   _ __ ___    ___
  |  __|   / _ \  | '__| | '_ ` _ \  / __|
  | |     | (_) | | |    | | | | | | \__ \
  |_|      \___/  |_|    |_| |_| |_| |___/
@@ -14,29 +14,29 @@
 
 #pragma once
 
-#include "main.h"
+#include "SDK.h"
 
 // #define	FRAME_95_TITLE
 
 #define	FRAME_TITLE_TEXT	Color(255, 255, 255)
-#define	FRAME_CONTENTS_TEXT	Color(255, 255, 255)
-#define	FRAME_BACKGROUND	Color(255, 255, 255)
-#define	FRAME_BORDER		Color(110, 200, 25)
+#define	FRAME_CONTENTS_TEXT	Color(255,255,255)
+#define	FRAME_BACKGROUND	Color(45, 45, 45)
+#define	FRAME_BORDER		Color(20, 20, 20)
 #define	FRAME_INNER			Color(0, 0, 0)
 #define	FRAME_OUTER			Color(0, 0, 0)
-#define	FRAME_GEOMETRY		Color(0, 0, 0)
+#define	FRAME_GEOMETRY		Color(11, 11, 11)
 #define	FRAME_CROSS			Color(255, 255, 255)
 
 
 
-#define	CHECKBOX_GRAY		Color(212, 208, 200)
+#define	CHECKBOX_GRAY		Color(255, 147, 0)//Color(212, 208, 200)
 
 
 
-#define	BUTTON_OVER			Color(220, 235, 250)
-#define	BUTTON_OUT			Color(230, 230, 230)
-#define	BUTTON_OVER_OUTLINE	Color(120, 165, 245)
-#define	BUTTON_OUT_OUTLINE	Color(152, 152, 152)
+#define	BUTTON_OVER			Color(17, 17, 17)
+#define	BUTTON_OUT			Color(255, 147, 0)
+#define	BUTTON_OVER_OUTLINE	Color(255, 149, 0)
+#define	BUTTON_OUT_OUTLINE	Color(255, 149, 0)
 
 
 /* === Non-user code === */
@@ -54,6 +54,14 @@ namespace forms
 	extern int mousex;
 	extern int mousey;
 
+	inline int clamp(int v, int mmin, int mmax)
+	{
+		if (v > mmax) return mmax;
+		if (v < mmin) return mmin;
+
+		return v;
+	}
+
 	struct Buttons
 	{
 		bool Left;
@@ -66,11 +74,11 @@ namespace forms
 
 		void Refresh()
 		{
-			LeftClick	= false;
-			RightClick	= false;
+			LeftClick = false;
+			RightClick = false;
 
-			Left	= GetAsyncKeyState(VK_LBUTTON);
-			Right	= GetAsyncKeyState(VK_RBUTTON);
+			Left = GetAsyncKeyState(VK_LBUTTON);
+			Right = GetAsyncKeyState(VK_RBUTTON);
 
 			if (LeftPrev != Left)
 				LeftPrev = LeftClick = Left;
@@ -97,13 +105,13 @@ namespace forms
 		// conv to dx color system
 		inline DWORD GetDX_ARGB()
 		{
-			return ((DWORD)((255<<24)|(((r)&0xFF)<<16)|(((g)&0xFF)<<8)|((b)&0xFF)));
+			return ((DWORD)((255 << 24) | (((r) & 0xFF) << 16) | (((g) & 0xFF) << 8) | ((b) & 0xFF)));
 		}
 
 		// conv to my color system
 		inline DWORD GetCustom()
 		{
-			return ((DWORD)((((r)&0xFF)<<24)|(((g)&0xFF)<<16)|(((b)&0xFF)<<8)|255));
+			return ((DWORD)((((r) & 0xFF) << 24) | (((g) & 0xFF) << 16) | (((b) & 0xFF) << 8) | 255));
 		}
 	};
 
@@ -111,8 +119,8 @@ namespace forms
 	void Fn_DrawOutlinedRect(int x, int y, int w, int h, Color color);
 	void Fn_DrawText(int x, int y, const char* text, Color color);
 	void Fn_DrawLine(int x0, int y0, int x1, int y1, Color color);
-	void Fn_GetScreenSize(int &w, int &h);
-	void Fn_GetTextSize(const char* text, int &w, int &h);
+	void Fn_GetScreenSize(int& w, int& h);
+	void Fn_GetTextSize(const char* text, int& w, int& h);
 
 	const char* ExplainKey(int vk);
 
@@ -137,8 +145,8 @@ namespace forms
 	{
 		DenyFutureInputThisFrame();
 
-		buttons.LeftClick	= false;
-		buttons.RightClick	= false;
+		buttons.LeftClick = false;
+		buttons.RightClick = false;
 	}
 
 
@@ -151,7 +159,7 @@ namespace forms
 	{
 	public:
 		F_BaseObject* Parent;
-		
+
 		int x, y;
 		int w, h;
 
@@ -161,8 +169,8 @@ namespace forms
 		static bool IsValidElement(F_BaseObject* obj)
 		{
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i] = obj)
-				return true;
+				if (elements[i] = obj)
+					return true;
 
 			return false;
 		}
@@ -180,58 +188,58 @@ namespace forms
 		virtual ~F_BaseObject()
 		{
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i]->GetParent() == this)
-				delete elements[i];
+				if (elements[i]->GetParent() == this)
+					delete elements[i];
 		}
 
 		inline void Register()
 		{
 			elements.push_back(this);
 		}
-		
+
 		inline void UnRegister()
 		{
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i] == this)
-				elements.erase(elements.begin() + i);
+				if (elements[i] == this)
+					elements.erase(elements.begin() + i);
 		}
 
 		inline void InvokeChildrenDrawing(int x, int y)
 		{
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i]->GetParent() == this)
-			{
-				int px, py, w, h;
+				if (elements[i]->GetParent() == this)
+				{
+					int px, py, w, h;
 
-				elements[i]->GetPos(px, py);
-				elements[i]->GetSize(w, h);
-				elements[i]->Paint(x + px, y + py, w, h);
-			}
+					elements[i]->GetPos(px, py);
+					elements[i]->GetSize(w, h);
+					elements[i]->Paint(x + px, y + py, w, h);
+				}
 		}
 
 		inline void InvokeChildrenThinking(int x, int y)
 		{
 			for (int i = elements.size() - 1; i > -1; --i)
-			if (elements[i]->GetParent() == this)
-			{
-				int px, py, w, h;
+				if (elements[i]->GetParent() == this)
+				{
+					int px, py, w, h;
 
-				elements[i]->GetPos(px, py);
-				elements[i]->GetSize(w, h);
-				elements[i]->Think(x + px, y + py, w, h);
-			}
+					elements[i]->GetPos(px, py);
+					elements[i]->GetSize(w, h);
+					elements[i]->Think(x + px, y + py, w, h);
+				}
 		}
 
 		inline void MakeTop()
 		{
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i] == this)
-			{
-				elements.erase(elements.begin() + i);
-				elements.push_back(this);
+				if (elements[i] == this)
+				{
+					elements.erase(elements.begin() + i);
+					elements.push_back(this);
 
-				break;
-			}
+					break;
+				}
 		}
 
 		inline void SetParent(F_BaseObject* obj)
@@ -239,8 +247,8 @@ namespace forms
 			Parent = obj;
 
 			for (unsigned i = 0; i < elements.size(); i++)
-			if (elements[i] == obj)
-				elements[i]->Attached(this);
+				if (elements[i] == obj)
+					elements[i]->Attached(this);
 		}
 
 		inline F_BaseObject* GetParent()
@@ -266,13 +274,13 @@ namespace forms
 				h = _h;
 		}
 
-		inline void GetPos(int &_x, int &_y)
+		inline void GetPos(int& _x, int& _y)
 		{
 			_x = x;
 			_y = y;
 		}
 
-		inline void GetSize(int &_w, int &_h)
+		inline void GetSize(int& _w, int& _h)
 		{
 			_w = w;
 			_h = h;
@@ -287,14 +295,14 @@ namespace forms
 		{
 			return visible;
 		}
-		
-		virtual void Paint(int x, int y, int w, int h)	{ };
-		virtual void Think(int x, int y, int w, int h)	{ };
-		virtual void Attached(F_BaseObject* obj)		{ };
+
+		virtual void Paint(int x, int y, int w, int h) { };
+		virtual void Think(int x, int y, int w, int h) { };
+		virtual void Attached(F_BaseObject* obj) { };
 	};
 
 	/*
-		 _           _          _ 
+		 _           _          _
 		| |         | |        | |
 		| |     __ _| |__   ___| |
 		| |    / _` | '_ \ / _ \ |
@@ -331,11 +339,11 @@ namespace forms
 	};
 
 	/*
-		 _____         _     _               
-		|_   _|       | |   | |              
+		 _____         _     _
+		|_   _|       | |   | |
 		  | | _____  _| |_  | |__   _____  __
 		  | |/ _ \ \/ / __| | '_ \ / _ \ \/ /
-		  | |  __/>  <| |_  | |_) | (_) >  < 
+		  | |  __/>  <| |_  | |_) | (_) >  <
 		  \_/\___/_/\_\\__| |_.__/ \___/_/\_\
 
 	*/
@@ -346,9 +354,9 @@ namespace forms
 		F_TextBox()
 		{
 			acceptinput = 0;
-			filesystem	= 0;
-			textptr		= 0;
-			*entry		= 0;
+			filesystem = 0;
+			textptr = 0;
+			*entry = 0;
 
 			SetMaxLength();
 		}
@@ -400,50 +408,50 @@ namespace forms
 				bool caps = GetKeyState(VK_CAPITAL);
 
 				for (int i = 1; i <= 255; i++)
-				if (GetAsyncKeyState(i) & 1)
-				{
-					char chr = MapVirtualKey(i, MAPVK_VK_TO_CHAR) & 255;
-
-					if (!chr || (chr == '\t'))
-						continue;
-
-					if (wait4release)
-						return;
-
-					if (shift)
+					if (GetAsyncKeyState(i) & 1)
 					{
-						if (chr == '-') chr = '_';
-						if (chr == '=') chr = '+';
-						if (chr == '0') chr = ')';
-						if (chr == '9') chr = '(';
-						if (chr == '8') chr = '*';
-						if (chr == '7') chr = '&';
-						if (chr == '6') chr = '^';
-						if (chr == '5') chr = '%';
-						if (chr == '4') chr = '$';
-						if (chr == '3') chr = '#';
-						if (chr == '2') chr = '@';
-						if (chr == '1') chr = '!';
+						char chr = MapVirtualKey(i, MAPVK_VK_TO_CHAR) & 255;
 
-						if (chr == ';') chr = ':';
-						if (chr == '\'') chr = '"';
-						if (chr == '/') chr = '?';
-						if (chr == '.') chr = '>';
-						if (chr == ',') chr = '<';
-						if (chr == ']') chr = '}';
-						if (chr == '[') chr = '{';
-					}
+						if (!chr || (chr == '\t'))
+							continue;
 
-					if (chr == '\r' || chr == '\n')
-					{
-						acceptinput = 0;
-						glob_acceptinput = 0;
-					}
-					else if (chr == '\b')
-						entry[max(strlen(entry) - 1, 0)] = 0;
-					else if (strlen(entry) < textlimit)
-					{
-						if (filesystem ? (
+						if (wait4release)
+							return;
+
+						if (shift)
+						{
+							if (chr == '-') chr = '_';
+							if (chr == '=') chr = '+';
+							if (chr == '0') chr = ')';
+							if (chr == '9') chr = '(';
+							if (chr == '8') chr = '*';
+							if (chr == '7') chr = '&';
+							if (chr == '6') chr = '^';
+							if (chr == '5') chr = '%';
+							if (chr == '4') chr = '$';
+							if (chr == '3') chr = '#';
+							if (chr == '2') chr = '@';
+							if (chr == '1') chr = '!';
+
+							if (chr == ';') chr = ':';
+							if (chr == '\'') chr = '"';
+							if (chr == '/') chr = '?';
+							if (chr == '.') chr = '>';
+							if (chr == ',') chr = '<';
+							if (chr == ']') chr = '}';
+							if (chr == '[') chr = '{';
+						}
+
+						if (chr == '\r' || chr == '\n')
+						{
+							acceptinput = 0;
+							glob_acceptinput = 0;
+						}
+						else if (chr == '\b')
+							entry[max(strlen(entry) - 1, 0)] = 0;
+						else if (strlen(entry) < textlimit)
+						{
+							if (filesystem ? (
 								(chr != '<') &&
 								(chr != '>') &&
 								(chr != ':') &&
@@ -453,34 +461,34 @@ namespace forms
 								(chr != '|') &&
 								(chr != '?') &&
 								(chr != '*')
-							) : 1)
-							entry[strlen(entry)] = (caps != shift) ? toupper(chr) : tolower(chr);
-					}
+								) : 1)
+								entry[strlen(entry)] = (caps != shift) ? toupper(chr) : tolower(chr);
+						}
 
-					if (textptr)
-						strcpy(textptr, entry);
-				}
+						if (textptr)
+							strcpy(textptr, entry);
+					}
 
 				wait4release = 0;
 			}
 
 			if (buttons.LeftClick)
-			if (CanAcceptInput() && IsMouseOver(x, y, w, h))
-			{
-				if (!acceptinput && !glob_acceptinput)
+				if (CanAcceptInput() && IsMouseOver(x, y, w, h))
 				{
-					wait4release = 1;
-					acceptinput = 1;
-					glob_acceptinput = 1;
+					if (!acceptinput && !glob_acceptinput)
+					{
+						wait4release = 1;
+						acceptinput = 1;
+						glob_acceptinput = 1;
 
-					DenyFutureInputThisFrame();
+						DenyFutureInputThisFrame();
+					}
 				}
-			}
-			else if (acceptinput)
-			{
-				acceptinput = 0;
-				glob_acceptinput = 0;
-			}
+				else if (acceptinput)
+				{
+					acceptinput = 0;
+					glob_acceptinput = 0;
+				}
 		}
 
 		inline const char* GetText()
@@ -510,26 +518,26 @@ namespace forms
 			if (variable)
 				SetText(variable);
 		}
-		
+
 		int		textlimit;
 		bool	filesystem;
 		bool	acceptinput;
 		bool	wait4release;
 		char	entry[255];
-		char*	textptr;
+		char* textptr;
 
 		static bool glob_acceptinput;
 	};
 
 	/*
-		 _   __             _                   
-		| | / /            | |                  
-		| |/ /  ___ _   _  | |_ _ __ __ _ _ __  
-		|    \ / _ \ | | | | __| '__/ _` | '_ \ 
+		 _   __             _
+		| | / /            | |
+		| |/ /  ___ _   _  | |_ _ __ __ _ _ __
+		|    \ / _ \ | | | | __| '__/ _` | '_ \
 		| |\  \  __/ |_| | | |_| | | (_| | |_) |
-		\_| \_/\___|\__, |  \__|_|  \__,_| .__/ 
-					 __/ |               | |    
-					|___/                |_|    
+		\_| \_/\___|\__, |  \__|_|  \__,_| .__/
+					 __/ |               | |
+					|___/                |_|
 	*/
 
 	class F_KeyTrap : public F_BaseObject
@@ -537,8 +545,8 @@ namespace forms
 	public:
 		F_KeyTrap()
 		{
-			active				= 0;
-			wait_for_release	= 0;
+			active = 0;
+			wait_for_release = 0;
 		}
 
 		virtual void Paint(int x, int y, int w, int h)
@@ -565,7 +573,7 @@ namespace forms
 			}
 			else
 			{
-				const char* key = *variable ? ExplainKey(*variable) : "Unbound";
+				const char* key = *variable ? ExplainKey(*variable) : "Not bound";
 
 				int tw, th;
 				Fn_GetTextSize(key, tw, th);
@@ -589,20 +597,20 @@ namespace forms
 			if (active)
 			{
 				for (int i = 1; i <= 255; i++)
-				if ((GetAsyncKeyState(i) & 1) && (*ExplainKey(i) || i == VK_ESCAPE))
-				{
-					if (wait_for_release)
-						return;
+					if ((GetAsyncKeyState(i) & 1) && (*ExplainKey(i) || i == VK_ESCAPE))
+					{
+						if (wait_for_release)
+							return;
 
-					*variable = (i == VK_ESCAPE) ? 0 : i;
+						*variable = (i == VK_ESCAPE) ? 0 : i;
 
-					active = false;
-					glob_active = false;
+						active = false;
+						glob_active = false;
 
-					DenyFutureInput();
+						DenyFutureInput();
 
-					break;
-				}
+						break;
+					}
 
 				wait_for_release = false;
 			}
@@ -633,12 +641,12 @@ namespace forms
 	};
 
 	/*
-		 _____ _ _     _           
-		/  ___| (_)   | |          
-		\ `--.| |_  __| | ___ _ __ 
+		 _____ _ _     _
+		/  ___| (_)   | |
+		\ `--.| |_  __| | ___ _ __
 		 `--. \ | |/ _` |/ _ \ '__|
-		/\__/ / | | (_| |  __/ |   
-		\____/|_|_|\__,_|\___|_|   
+		/\__/ / | | (_| |  __/ |
+		\____/|_|_|\__,_|\___|_|
 
 	*/
 
@@ -654,17 +662,17 @@ namespace forms
 			sprintf(value, "%i", *variable);
 
 			Fn_GetTextSize(value, tw, th);
-			Fn_DrawText(x + w - tw, y, value, FRAME_CONTENTS_TEXT);
+			Fn_DrawText(x + w - tw, y + 5, value, FRAME_CONTENTS_TEXT);
 
-			Fn_DrawFilledRect(x, y + 23, w, 4, BUTTON_OUT);
-			Fn_DrawOutlinedRect(x, y + 23, w, 4, BUTTON_OUT_OUTLINE);
+			Fn_DrawFilledRect(x, y + 23, w, 4, Color(0, 0, 0));
+			//Fn_DrawOutlinedRect(x, y + 23, w, 4, Color(0,255,0));
 
 			bool over = IsMouseOver(x, y + 15, w, 20);
 
 			int offs = (int)(((float)(clamp(*variable, mn, mx) - mn) / (float)(mx - mn)) * ((float)w - 10.f));
 
-			Fn_DrawFilledRect(x + offs, y + 15, 10, 20, over ? BUTTON_OVER : BUTTON_OUT);
-			Fn_DrawOutlinedRect(x + offs, y + 15, 10, 20, over ? BUTTON_OVER_OUTLINE : BUTTON_OUT_OUTLINE);
+			Fn_DrawFilledRect(x + offs, y + 15, 10, 20, over ? Color(171, 171, 171) : Color(71, 71, 71));
+			Fn_DrawOutlinedRect(x + offs, y + 15, 10, 20, over ? Color(0, 0, 0) : Color(0, 0, 0));
 		}
 
 		virtual void Think(int x, int y, int w, int h)
@@ -700,11 +708,11 @@ namespace forms
 	};
 
 	/*
-		 _____                 _           _               
-		/  __ \               | |         | |              
+		 _____                 _           _
+		/  __ \               | |         | |
 		| /  \/ ___  _ __ ___ | |__   ___ | |__   _____  __
 		| |    / _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ \/ /
-		| \__/\ (_) | | | | | | |_) | (_) | |_) | (_) >  < 
+		| \__/\ (_) | | | | | | |_) | (_) | |_) | (_) >  <
 		 \____/\___/|_| |_| |_|_.__/ \___/|_.__/ \___/_/\_\
 
 	*/
@@ -728,20 +736,20 @@ namespace forms
 		virtual void Paint(int x, int y, int w, int h)
 		{
 			SetSize(0, 15);
-			
+
 			int tw, th;
 
 			if (open)
 			{
-				Fn_DrawFilledRect(x, y + h - 1, w, items.size() * h,	BUTTON_OUT);
-				Fn_DrawOutlinedRect(x, y + h - 1, w, items.size() * h,	BUTTON_OUT_OUTLINE);
+				Fn_DrawFilledRect(x, y + h - 1, w, items.size() * h, BUTTON_OUT);
+				Fn_DrawOutlinedRect(x, y + h - 1, w, items.size() * h, Color(0, 0, 0));
 
 				for (unsigned i = 0; i < items.size(); i++)
 				{
 					if (IsMouseOver(x, y + h * (i + 1) - 1, w, h))
 					{
-						Fn_DrawFilledRect(x, y + h * (i + 1) - 1, w, h,		BUTTON_OVER);
-						Fn_DrawOutlinedRect(x, y + h * (i + 1) - 1, w, h,	BUTTON_OVER_OUTLINE);
+						Fn_DrawFilledRect(x, y + h * (i + 1) - 1, w, h, Color(63, 63, 63));
+						Fn_DrawOutlinedRect(x, y + h * (i + 1) - 1, w, h, Color(0, 0, 0));
 					}
 
 					Fn_GetTextSize(items[i], tw, th);
@@ -751,17 +759,19 @@ namespace forms
 
 			if (IsMouseOver(x, y, w, h) || open)
 			{
-				Fn_DrawFilledRect(x, y, w, h,	BUTTON_OVER);
-				Fn_DrawOutlinedRect(x, y, w, h,	BUTTON_OVER_OUTLINE);
+				Fn_DrawFilledRect(x, y, w, h, BUTTON_OVER_OUTLINE);
+				Fn_DrawOutlinedRect(x, y, w, h, Color(0, 0, 0));
 
-				Fn_DrawLine(x + w - h, y + 3, x + w - h, y + h - 4, BUTTON_OVER_OUTLINE);
+				Fn_DrawLine(x + w - h, y + 3, x + w - h, y + h - 4, Color(14, 14, 14));
+				//Fn_DrawLine(x - w + h, y - 3, x - w + h, y - h + 4, Color(14, 14, 14));
 			}
 			else
 			{
-				Fn_DrawFilledRect(x, y, w, h,	BUTTON_OUT);
-				Fn_DrawOutlinedRect(x, y, w, h,	BUTTON_OUT_OUTLINE);
+				Fn_DrawFilledRect(x, y, w, h, Color(91, 104, 109));
+				//Fn_DrawOutlinedRect(x, y, w, h, BUTTON_OUT_OUTLINE);
 
-				Fn_DrawLine(x + w - h, y + 3, x + w - h, y + h - 4, BUTTON_OUT_OUTLINE);
+				Fn_DrawLine(x + w - h, y + 3, x + w - h, y + h - 4, Color(14, 14, 14));
+				//	Fn_DrawLine(x - 2, y + 5, x + w - h - 3, y + h - 4, Color(14, 14, 14));
 			}
 
 			item_selected = clamp(item_selected, 0, items.size() - 1);
@@ -779,7 +789,7 @@ namespace forms
 				DenyFutureInput();
 
 				if (open && cbOpen)
-					((void (*)(void*))cbOpen)(this);
+					((void(*)(void*))cbOpen)(this);
 			}
 
 			if (open)
@@ -788,28 +798,28 @@ namespace forms
 					open = 0;
 
 				if (CanAcceptInput() && buttons.LeftClick)
-				for (unsigned i = 0; i < items.size(); i++)
-				{
-					if (IsMouseOver(x, y + h * (i + 1) - 1, w, h))
+					for (unsigned i = 0; i < items.size(); i++)
 					{
-						DenyFutureInputThisFrame();
-
-						item_selected = item_selected_e = i;
-						open = 0;
-
-						if (cbSelect)
+						if (IsMouseOver(x, y + h * (i + 1) - 1, w, h))
 						{
-							int ov = ((int (*)(void*))cbSelect)(this);
+							DenyFutureInputThisFrame();
 
-							if (variable)
-								*variable = ov;
+							item_selected = item_selected_e = i;
+							open = 0;
+
+							if (cbSelect)
+							{
+								int ov = ((int(*)(void*))cbSelect)(this);
+
+								if (variable)
+									*variable = ov;
+							}
+							else if (variable)
+								*variable = i;
+
+							break;
 						}
-						else if (variable)
-							*variable = i;
-
-						break;
 					}
-				}
 			}
 			else if (variable && item_selected_e != *variable && !cbSelect)
 			{
@@ -863,11 +873,11 @@ namespace forms
 	};
 
 	/*
-		 _____ _               _    _               
-		/  __ \ |             | |  | |              
+		 _____ _               _    _
+		/  __ \ |             | |  | |
 		| /  \/ |__   ___  ___| | _| |__   _____  __
 		| |   | '_ \ / _ \/ __| |/ / '_ \ / _ \ \/ /
-		| \__/\ | | |  __/ (__|   <| |_) | (_) >  < 
+		| \__/\ | | |  __/ (__|   <| |_) | (_) >  <
 		 \____/_| |_|\___|\___|_|\_\_.__/ \___/_/\_\
 
 	*/
@@ -886,19 +896,17 @@ namespace forms
 			Fn_GetTextSize(label, tw, th);
 
 			if (IsMouseOver(x, y, 17 + tw, 11))
-				Fn_DrawFilledRect(x + 2, y + 2, 7, 7, CHECKBOX_GRAY);
+				Fn_DrawFilledRect(x + 2, y + 2, 7, 7, Color(91, 104, 109));
 
 			Fn_DrawText(x + 15, y, label, FRAME_CONTENTS_TEXT);
 
 			if (GetChecked())
 			{
-				Fn_DrawLine(x + 6, y + 8, x + 8, y + 3, FRAME_GEOMETRY);
-				Fn_DrawLine(x + 2, y + 6, x + 6, y + 8, FRAME_GEOMETRY);
-
-				y--;
-
-				Fn_DrawLine(x + 6, y + 8, x + 7, y + 3, FRAME_GEOMETRY);
-				Fn_DrawLine(x + 2, y + 6, x + 6, y + 8, FRAME_GEOMETRY);
+				Fn_DrawFilledRect(x + 2, y + 2, 7, 7, Color(255, 149, 0));
+			}
+			if (GetChecked() && IsMouseOver(x, y, 17 + tw, 11))
+			{
+				Fn_DrawFilledRect(x + 2, y + 2, 7, 7, Color(91, 104, 109));
 			}
 		}
 
@@ -914,15 +922,15 @@ namespace forms
 			Fn_GetTextSize(label, tw, th);
 
 			if (IsMouseOver(x, y, 17 + tw, 11))
-			if (CanAcceptInput() && buttons.LeftClick)
-			{
-				SetChecked(!GetChecked());
+				if (CanAcceptInput() && buttons.LeftClick)
+				{
+					SetChecked(!GetChecked());
 
-				if (variable)
-					*variable = GetChecked();
+					if (variable)
+						*variable = GetChecked();
 
-				DenyFutureInput();
-			}
+					DenyFutureInput();
+				}
 		}
 
 		inline void SetVariable(int* v)
@@ -951,14 +959,14 @@ namespace forms
 	};
 
 	/*
-		 _____       _ _ _   _            
-		/  ___|     | (_) | | |           
-		\ `--. _ __ | |_| |_| |_ ___ _ __ 
+		 _____       _ _ _   _
+		/  ___|     | (_) | | |
+		\ `--. _ __ | |_| |_| |_ ___ _ __
 		 `--. \ '_ \| | | __| __/ _ \ '__|
-		/\__/ / |_) | | | |_| ||  __/ |   
-		\____/| .__/|_|_|\__|\__\___|_|   
-			  | |                         
-			  |_|                         
+		/\__/ / |_) | | | |_| ||  __/ |
+		\____/| .__/|_|_|\__|\__\___|_|
+			  | |
+			  |_|
 
 	*/
 
@@ -983,7 +991,7 @@ namespace forms
 	};
 
 	/*
-		______                _ 
+		______                _
 		| ___ \              | |
 		| |_/ /_ _ _ __   ___| |
 		|  __/ _` | '_ \ / _ \ |
@@ -997,9 +1005,9 @@ namespace forms
 	public:
 		F_Panel()
 		{
-			fill_x		= 0;
-			fill_vert	= 0;
-			autofill	= 0;
+			fill_x = 0;
+			fill_vert = 0;
+			autofill = 0;
 		}
 
 		virtual void Paint(int x, int y, int w, int h)
@@ -1062,12 +1070,12 @@ namespace forms
 	};
 
 	/*
-		______                _     _           _     _ 
-		| ___ \              | |   | |         | |   | |          
-		| |_/ /_ _ _ __   ___| |   | |__   ___ | | __| | ___ _ __ 
+		______                _     _           _     _
+		| ___ \              | |   | |         | |   | |
+		| |_/ /_ _ _ __   ___| |   | |__   ___ | | __| | ___ _ __
 		|  __/ _` | '_ \ / _ \ |   | '_ \ / _ \| |/ _` |/ _ \ '__|
-		| | | (_| | | | |  __/ |   | | | | (_) | | (_| |  __/ |   
-		\_|  \__,_|_| |_|\___|_|   |_| |_|\___/|_|\__,_|\___|_|   
+		| | | (_| | | | |  __/ |   | | | | (_) | | (_| |  __/ |
+		\_|  \__,_|_| |_|\___|_|   |_| |_|\___/|_|\__,_|\___|_|
 
 	*/
 
@@ -1089,20 +1097,23 @@ namespace forms
 				panel = _panel;
 			}
 
-			const char*		pname;
-			F_BaseObject*	panel;
+			const char* pname;
+			F_BaseObject* panel;
 		};
 
 		virtual void Paint(int x, int y, int w, int h)
 		{
 			int tab_w = w / attachments.size();
 
-			Fn_DrawLine(x, y + 20, x + selected_panel * tab_w, y + 20, BUTTON_OUT_OUTLINE);
-			Fn_DrawLine(x + selected_panel * tab_w + tab_w, y + 20, x + w, y + 20, BUTTON_OUT_OUTLINE);
-			
+			//Fn_DrawLine(x, y + 20, x + selected_panel * tab_w, y + 20, BUTTON_OUT_OUTLINE);
+			//Fn_DrawLine(x + selected_panel * tab_w + tab_w, y + 20, x + w, y + 20, BUTTON_OUT_OUTLINE);
+			Fn_DrawLine(x + selected_panel * tab_w, y + 5, x + selected_panel * tab_w + tab_w - 1, y + 5, BUTTON_OUT_OUTLINE);
+			Fn_DrawLine(x + selected_panel * tab_w, y + 4, x + selected_panel * tab_w + tab_w - 1, y + 4, BUTTON_OUT_OUTLINE);
+			Fn_DrawLine(x + selected_panel * tab_w, y + 3, x + selected_panel * tab_w + tab_w - 1, y + 3, BUTTON_OUT_OUTLINE);
 			Fn_DrawLine(x + selected_panel * tab_w, y + 2, x + selected_panel * tab_w + tab_w - 1, y + 2, BUTTON_OUT_OUTLINE);
-			Fn_DrawLine(x + selected_panel * tab_w, y + 2, x + selected_panel * tab_w, y + 20, BUTTON_OUT_OUTLINE);
-			Fn_DrawLine(x + selected_panel * tab_w + tab_w - 1, y + 2, x + selected_panel * tab_w + tab_w - 1, y + 20, BUTTON_OUT_OUTLINE);
+
+			Fn_DrawLine(x + selected_panel * tab_w, y + 2, x + selected_panel * tab_w, y + 20, Color(0, 0, 0));
+			Fn_DrawLine(x + selected_panel * tab_w + tab_w - 1, y + 2, x + selected_panel * tab_w + tab_w - 1, y + 20, Color(0, 0, 0));
 
 			int tw, th;
 			Fn_GetTextSize(attachments[selected_panel]->pname, tw, th);
@@ -1122,16 +1133,16 @@ namespace forms
 				if (IsMouseOver(x + i * tab_w, y, tab_w, 20))
 				{
 					Fn_DrawFilledRect(x + i * tab_w, y + 6, tab_w, 14, BUTTON_OVER);
-					Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w + tab_w - 1, y + 6, BUTTON_OVER_OUTLINE);
-					Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w, y + 20, BUTTON_OVER_OUTLINE);
-					Fn_DrawLine(x + i * tab_w + tab_w - 1, y + 6, x + i * tab_w + tab_w - 1, y + 20, BUTTON_OVER_OUTLINE);
+					//	Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w + tab_w - 1, y + 6, BUTTON_OVER_OUTLINE);
+						//Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w, y + 20, BUTTON_OVER_OUTLINE);
+						//Fn_DrawLine(x + i * tab_w + tab_w - 1, y + 6, x + i * tab_w + tab_w - 1, y + 20, BUTTON_OVER_OUTLINE);
 				}
 				else
 				{
 					Fn_DrawFilledRect(x + i * tab_w, y + 6, tab_w, 14, BUTTON_OUT);
-					Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w + tab_w - 1, y + 6, BUTTON_OUT_OUTLINE);
-					Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w, y + 20, BUTTON_OUT_OUTLINE);
-					Fn_DrawLine(x + i * tab_w + tab_w - 1, y + 6, x + i * tab_w + tab_w - 1, y + 20, BUTTON_OUT_OUTLINE);
+					//Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w + tab_w - 1, y + 6, BUTTON_OUT_OUTLINE);
+					//Fn_DrawLine(x + i * tab_w, y + 6, x + i * tab_w, y + 20, BUTTON_OUT_OUTLINE);
+					//Fn_DrawLine(x + i * tab_w + tab_w - 1, y + 6, x + i * tab_w + tab_w - 1, y + 20, BUTTON_OUT_OUTLINE);
 				}
 
 				Fn_DrawText(x + i * tab_w + tab_w / 2 - tw / 2, y + 14 - th / 2, attachments[i]->pname, FRAME_CONTENTS_TEXT);
@@ -1146,13 +1157,13 @@ namespace forms
 			{
 				int tw, th;
 				Fn_GetTextSize(attachments[i]->pname, tw, th);
-				
+
 				if (i == selected_panel)
 				{
 					int _w, _h;
 
 					attachments[i]->panel->GetSize(_w, _h);
-					attachments[i]->panel->Think(x, y + 21, _w, _h); 
+					attachments[i]->panel->Think(x, y + 21, _w, _h);
 				}
 				else if (CanAcceptInput() && IsMouseOver(x + i * tab_w, y, tab_w, 20) && buttons.LeftClick)
 				{
@@ -1174,19 +1185,19 @@ namespace forms
 	};
 
 	/*
-		______       _   _              
-		| ___ \     | | | |             
-		| |_/ /_   _| |_| |_ ___  _ __  
-		| ___ \ | | | __| __/ _ \| '_ \ 
+		______       _   _
+		| ___ \     | | | |
+		| |_/ /_   _| |_| |_ ___  _ __
+		| ___ \ | | | __| __/ _ \| '_ \
 		| |_/ / |_| | |_| || (_) | | | |
-		\____/ \__,_|\__|\__\___/|_| |_|                                
+		\____/ \__,_|\__|\__\___/|_| |_|
 
 	*/
 
 	class F_Button : public F_BaseObject
 	{
 	public:
-		typedef void (*OnClickFn)(F_BaseObject* self);
+		typedef void(*OnClickFn)(F_BaseObject* self);
 
 		virtual void Paint(int x, int y, int w, int h)
 		{
@@ -1236,10 +1247,10 @@ namespace forms
 	};
 
 	/*
-		______                   
+		______
 		|  ___|
-		| |_ ___  _ __ _ __ ___  
-		|  _/ _ \| '__| '_ ` _ \ 
+		| |_ ___  _ __ _ __ ___
+		|  _/ _ \| '__| '_ ` _ \
 		| || (_) | |  | | | | | |
 		\_| \___/|_|  |_| |_| |_|
 
@@ -1253,10 +1264,10 @@ namespace forms
 			SetTitle("");
 			SetSizeable();
 
-			resize	= 0;
-			drag	= 0;
-			drag_x	= 0;
-			drag_y	= 0;
+			resize = 0;
+			drag = 0;
+			drag_x = 0;
+			drag_y = 0;
 		}
 
 		virtual void Paint(int x, int y, int w, int h)
@@ -1266,21 +1277,21 @@ namespace forms
 
 			Fn_DrawFilledRect(x + 4, y + 20, w - 8, h - 24, FRAME_BACKGROUND);
 
-			Fn_DrawFilledRect(x, y, w, 20,					FRAME_BORDER); // top
-			Fn_DrawFilledRect(x, y + h - 4, w, 4,			FRAME_BORDER); // bottom
-			Fn_DrawFilledRect(x, y + 20, 4, h - 24,			FRAME_BORDER); // left
-			Fn_DrawFilledRect(x + w - 4, y + 20, 4, h - 24,	FRAME_BORDER); // right
+			Fn_DrawFilledRect(x, y, w, 20, FRAME_BORDER); // top
+			Fn_DrawFilledRect(x, y + h - 4, w, 4, FRAME_BORDER); // bottom
+			Fn_DrawFilledRect(x, y + 20, 4, h - 24, FRAME_BORDER); // left
+			Fn_DrawFilledRect(x + w - 4, y + 20, 4, h - 24, FRAME_BORDER); // right
 
 			Fn_DrawOutlinedRect(x, y, w, h, FRAME_OUTER);
 			Fn_DrawOutlinedRect(x + 4, y + 20, w - 8, h - 24, FRAME_INNER);
 
-			Fn_DrawFilledRect(x + w - 19, y + 3, 15, 15, IsMouseOver(x + w - 19, y + 3, 15, 15) ? BUTTON_OVER : BUTTON_OUT);
-			Fn_DrawOutlinedRect(x + w - 19, y + 3, 15, 15, FRAME_GEOMETRY);
+			//Fn_DrawFilledRect(x + w - 19, y + 3, 15, 15, IsMouseOver(x + w - 19, y + 3, 15, 15) ? BUTTON_OVER : BUTTON_OUT);
+			//Fn_DrawOutlinedRect(x + w - 19, y + 3, 15, 15, FRAME_GEOMETRY);
 
-			Fn_DrawLine(x + w - 16, y + 6, x + w - 8, y + 15, FRAME_GEOMETRY);
+			/*Fn_DrawLine(x + w - 16, y + 6, x + w - 8, y + 15, FRAME_GEOMETRY);
 			Fn_DrawLine(x + w - 15, y + 6, x + w - 7, y + 15, FRAME_GEOMETRY);
 			Fn_DrawLine(x + w - 9, y + 6, x + w - 17, y + 15, FRAME_GEOMETRY);
-			Fn_DrawLine(x + w - 8, y + 6, x + w - 16, y + 15, FRAME_GEOMETRY);
+			Fn_DrawLine(x + w - 8, y + 6, x + w - 16, y + 15, FRAME_GEOMETRY);*/
 
 			if (title)
 			{
@@ -1300,7 +1311,7 @@ namespace forms
 				Fn_DrawLine(x + w - 13, y + h - 7, x + w - 7, y + h - 13, FRAME_GEOMETRY);
 				Fn_DrawLine(x + w - 16, y + h - 7, x + w - 7, y + h - 16, FRAME_GEOMETRY);
 			}
-			
+
 			InvokeChildrenDrawing(x + 5, y + 21);
 		}
 
@@ -1323,8 +1334,8 @@ namespace forms
 			{
 				if (CanAcceptInput() && buttons.LeftClick)
 				{
-					SetVisible(0);
-					DenyFutureInput();
+					//SetVisible(0);
+					//DenyFutureInput();
 				}
 			}
 			else
@@ -1349,22 +1360,22 @@ namespace forms
 			}
 
 			if (resize)
-			if (buttons.Left && sizeable)
-				SetSize(max(mousex - x, 55), max(mousey - y, 60));
-			else
-			{
-				resize = false;
-				glob_drag = false;
-			}
-			
+				if (buttons.Left && sizeable)
+					SetSize(max(mousex - x, 55), max(mousey - y, 60));
+				else
+				{
+					resize = false;
+					glob_drag = false;
+				}
+
 			if (drag)
-			if (buttons.Left)
-				SetPos(mousex - drag_x, mousey - drag_y);
-			else
-			{
-				drag = false;
-				glob_drag = false;
-			}
+				if (buttons.Left)
+					SetPos(mousex - drag_x, mousey - drag_y);
+				else
+				{
+					drag = false;
+					glob_drag = false;
+				}
 			else
 			{
 				int sw, sh;
@@ -1373,7 +1384,7 @@ namespace forms
 				x = clamp(x, 0, sw - w);
 				y = clamp(y, 0, sh - h);
 			}
-			
+
 			InvokeChildrenThinking(x + 5, y + 21);
 
 			if (!glob_drag && CanAcceptInput() && buttons.LeftClick && IsMouseOver(x, y, w, h))

@@ -85,13 +85,13 @@ int forms::mousey;
 forms::Buttons forms::buttons;
 
 bool forms::F_TextBox::glob_acceptinput = 0;
-bool forms::F_KeyTrap::glob_active		= 0;
-bool forms::F_Form::glob_drag			= 0;
-bool forms::inputallowed				= 0;
+bool forms::F_KeyTrap::glob_active = 0;
+bool forms::F_Form::glob_drag = 0;
+bool forms::inputallowed = 0;
 
 const char* forms::ExplainKey(int vk)
 {
-	static char explaination[16] = {0};
+	static char explaination[16] = { 0 };
 
 #define	DenyVK(_key) if (vk == _key) return explaination
 
@@ -115,8 +115,8 @@ const char* forms::ExplainKey(int vk)
 		case VK_LBUTTON:	return "LMB";
 		case VK_RBUTTON:	return "RMB";
 		case VK_MBUTTON:	return "Wheel";
-		case VK_XBUTTON1:	return "X1";
-		case VK_XBUTTON2:	return "X2";
+		case VK_XBUTTON1:	return "MOUSE4";
+		case VK_XBUTTON2:	return "MOUSE5";
 		case VK_INSERT:		return "Ins";
 		case VK_DELETE:		return "Del";
 		case VK_LSHIFT:		return "L Shift";
@@ -146,7 +146,7 @@ void forms::Render()
 
 		if (chk(GetWindowLong(Valve001, GWL_STYLE), WS_CAPTION))
 		{
-			static NONCLIENTMETRICS ncm = {0};
+			static NONCLIENTMETRICS ncm = { 0 };
 
 			if (!ncm.cbSize)
 				SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize = sizeof(NONCLIENTMETRICS), &ncm, 0);
@@ -163,13 +163,13 @@ void forms::Render()
 
 	buttons.Refresh();
 
-	for (unsigned i = 0; i < F_BaseObject::elements.size(); i++)
+	for (auto & element : F_BaseObject::elements)
 	{
-		F_BaseObject* obj = F_BaseObject::elements[i];
+		auto obj = element;
 
 		if (!obj)
 			continue;
-		
+
 		if (obj->GetParent()) // children should be handled by their parents
 			continue;
 
@@ -177,16 +177,16 @@ void forms::Render()
 
 		obj->GetPos(x, y);
 		obj->GetSize(w, h);
-		
-		F_BaseObject::elements[i]->Paint(x, y, w, h);
+
+		element->Paint(x, y, w, h);
 	}
-	
+
 	// TODO: use separate thread for controls running at 20 fps
 
 	for (int i = F_BaseObject::elements.size() - 1; i > -1; --i)
 	{
 		F_BaseObject* obj = F_BaseObject::elements[i];
-		
+
 		if (!obj)
 			continue;
 
